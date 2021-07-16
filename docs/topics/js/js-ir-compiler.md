@@ -1,7 +1,7 @@
 [//]: # (title: Kotlin/JS IR compiler)
 
 > The Kotlin/JS IR compiler is in [Alpha](components-stability.md). It may change incompatibly and require manual migration
->in the future. We appreciate your feedback on it in [YouTrack](https://youtrack.jetbrains.com/issues/KT).
+>in the future. We would appreciate your feedback on it in [YouTrack](https://youtrack.jetbrains.com/issues/KT).
 >
 {type="warning"}
 
@@ -23,24 +23,23 @@ project, pass a compiler type to the `js` function in your Gradle build script:
 ```groovy
 kotlin {
     js(IR) { // or: LEGACY, BOTH
-        // . . .
+        // ...
     }
-    binaries.executable()
+    binaries.executable() // not applicable to BOTH, see details below
 }
 ```
 
 - `IR` uses the new IR compiler backend for Kotlin/JS.
 - `LEGACY` uses the default compiler backend.
-- `BOTH` compiles your project with the new IR compiler as well as the default compiler backend. This is mainly useful for authoring libraries that are compatible with both backends, see [below](#authoring-libraries-for-the-ir-compiler-with-backwards-compatibility).
+- `BOTH` compiles your project with the new IR compiler as well as the default compiler backend. Use this mode for [authoring libraries compatible with both backends](#authoring-libraries-for-the-ir-compiler-with-backwards-compatibility).
 
 The compiler type can also be set in the `gradle.properties` file, with the key `kotlin.js.compiler=ir`.
 This behaviour is overwritten by any settings in the `build.gradle(.kts)`, however.
 
 ## Ignoring compilation errors
 
->_Ignore compilation errors_ mode is [Experimental](components-stability.md). It may be dropped or changed
-> at any time. Opt-in is required (see details below). Use it only for evaluation purposes. We appreciate your feedback 
-> on it in [YouTrack](https://youtrack.jetbrains.com/issues/KT).
+>_Ignore compilation errors_ mode is [Experimental](components-stability.md). It may be dropped or changed at any time.
+> Opt-in is required (see the details below), and you should use it only for evaluation purposes. We would appreciate your feedback on it in [YouTrack](https://youtrack.jetbrains.com/issues/KT).
 >
 {type="warning"}
 
@@ -72,6 +71,57 @@ kotlin {
 }
 ```
 
+## Lazy initialization of top-level properties
+
+> Lazy initialization of top-level properties is [Experimental](components-stability.md). It may be dropped or changed at any time.
+> Opt-in is required (see the details below), and you should use it only for evaluation purposes. We would appreciate your feedback on it in [YouTrack](https://youtrack.jetbrains.com/issue/KT-44320).
+>
+{type="warning"}
+
+For better application startup performance, the Kotlin/JS IR compiler offers an option to initialize top-level properties
+lazily. This way, the application loads without initializing all the top-level properties used in its code. It initializes
+only the ones needed at startup; other properties receive their values later when the code that uses them actually runs. 
+
+As an experimental feature, lazy initialization of top-level properties requires an opt-in. To use the lazy initialization
+of top-level properties, add the `-Xir-property-lazy-initialization` option when compiling the code with the JS IR compiler:
+
+<tabs>
+    
+```groovy
+tasks.withType(Kotlin2JsCompile) {
+   kotlinOptions {
+     freeCompilerArgs += "-Xir-property-lazy-initialization"
+   }
+}
+```
+
+```kotlin
+tasks.withType<Kotlin2JsCompile> {
+   kotlinOptions {
+     freeCompilerArgs += "-Xir-property-lazy-initialization"
+   }
+}
+```
+
+</tabs>
+
+## Preview: generation of TypeScript declaration files (d.ts)
+
+> The generation of TypeScript declaration files (`d.ts`) is [Experimental](components-stability.md). It may be dropped or changed at any time.
+> Opt-in is required (see the details below), and you should use it only for evaluation purposes. We would appreciate your feedback on it in [YouTrack](https://youtrack.jetbrains.com/issues?q=%23%7BKJS:%20d.ts%20generation%7D).
+>
+{type="warning"}
+
+The Kotlin/JS IR compiler is capable of generating TypeScript definitions from your Kotlin code. These definitions can be
+used by JavaScript tools and IDEs when working on hybrid apps to provide autocompletion, support static analyzers, and
+make it easier to include Kotlin code in JavaScript and TypeScript projects.
+
+Top-level declarations marked with [`@JsExport`](js-to-kotlin-interop.md#jsexport-annotation) in a project that produces
+executable files (`binaries.executable()`) will get a `.d.ts` file generated, which contains the TypeScript definitions
+for the exported Kotlin declarations.
+These declarations can be found in `build/js/packages/<package_name>/kotlin` alongside the corresponding
+un-webpacked JavaScript code.
+
 ## Current limitations of the IR compiler
 
 A major change with the new IR compiler backend is the **absence of binary compatibility** with the default backend.
@@ -83,7 +133,7 @@ that support this new backend**. Libraries published by JetBrains for Kotlin 1.4
 artifacts required for usage with the new IR compiler backend.
 
 **If you are a library author** looking to provide compatibility with the current compiler backend as well as the new IR
-compiler backend, additionally check out the [“Authoring libraries for the IR compiler”](#authoring-libraries-for-the-ir-compiler-with-backwards-compatibility)
+compiler backend, additionally check out the [section about authoring libraries for the IR compiler](#authoring-libraries-for-the-ir-compiler-with-backwards-compatibility)
 section.
 
 The IR compiler backend also has some discrepancies in comparison to the default backend. When trying out the new backend,
@@ -93,21 +143,11 @@ it's good to be mindful of these possible pitfalls.
 - Some **libraries that rely on specific characteristics** of the default backend, such as `kotlin-wrappers`, can display some problems. You can follow the investigation and progress [on YouTrack](https://youtrack.jetbrains.com/issue/KT-40525).
 - The IR backend **does not make Kotlin declarations available to JavaScript** by default at all. To make Kotlin declarations visible to JavaScript, they **must be** annotated with [`@JsExport`](js-to-kotlin-interop.md#jsexport-annotation).
 
-## Preview: generation of TypeScript declaration files (d.ts)
+## Migrating existing projects to the IR compiler
 
-The Kotlin/JS IR compiler is capable of generating TypeScript definitions from your Kotlin code. These definitions can be
-used by JavaScript tools and IDEs when working on hybrid apps to provide autocompletion, support static analyzers, and
-make it easier to include Kotlin code in JavaScript and TypeScript projects.
-
-Top-level declarations marked with [`@JsExport`](js-to-kotlin-interop.md#jsexport-annotation) in a project that produces
-executable files (`binaries.executable()`) will get a `.d.ts` file generated, which contains the TypeScript definitions
-for the exported Kotlin declarations.
-In Kotlin 1.4, these declarations can be found in `build/js/packages/<package_name>/kotlin` alongside the corresponding,
-un-webpacked JavaScript code.
-
-The generation of TypeScript declaration files is a feature exclusive to the IR compiler, and is in active development.
-If you run into any problems, please submit them to the Kotlin [issue tracker](https://youtrack.jetbrains.com/issues?q=%23%7BKJS:%20d.ts%20generation%7D)
-or vote for submitted issues that impact you. 
+Due to significant differences between the two Kotlin/JS compilers, making your Kotlin/JS code work with the IR compiler
+may require some adjustments. Learn how to migrate existing Kotlin/JS projects to the IR compiler in the [Kotlin/JS IR
+compiler migration guide](js-ir-migration.md).
 
 ## Authoring libraries for the IR compiler with backwards compatibility
 
@@ -120,7 +160,7 @@ or can be set as one of the project-specific options inside your `js` block insi
 ```groovy
 kotlin {
     js(BOTH) {
-        // . . .
+        // ...
     }
 }
 ```

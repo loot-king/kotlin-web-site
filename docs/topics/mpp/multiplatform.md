@@ -14,7 +14,7 @@ This is how Kotlin Multiplatform works.
 *   **Common Kotlin** includes the language, core libraries, and basic tools. Code written in common Kotlin works 
 everywhere on all platforms.
 *   With Kotlin Multiplatform libraries, you can reuse the multiplatform logic in common and platform-specific code. 
-Common code can rely on a set of libraries that cover everyday tasks such as [HTTP](http://ktor.io/clients/http-client/multiplatform.html), [serialization](https://github.com/Kotlin/kotlinx.serialization), and [managing 
+Common code can rely on a set of libraries that cover everyday tasks such as [HTTP](https://ktor.io/clients/http-client/multiplatform.html), [serialization](https://github.com/Kotlin/kotlinx.serialization), and [managing 
 coroutines](https://github.com/Kotlin/kotlinx.coroutines).
 *   To interop with platforms, use platform-specific versions of Kotlin. **Platform-specific versions of Kotlin** 
 (Kotlin/JVM, Kotlin/JS, Kotlin/Native) include extensions to the Kotlin language, and platform-specific libraries and tools. 
@@ -41,7 +41,7 @@ With this mechanism, a common source set defines an *expected declaration*, and 
 *actual declaration* that corresponds to the expected declaration. This works for most Kotlin declarations, such as 
 functions, classes, interfaces, enumerations, properties, and annotations.
 
-![Expect and actual declarations](expect-actual.png)
+![Expect and actual declarations](expect-actual.png){width=700}
 
 ```kotlin
 //Common

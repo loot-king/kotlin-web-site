@@ -18,7 +18,7 @@ Pick it up to start building powerful applications!
 
 Here is how you can take the first steps in developing Kotlin server-side applications.
 
-1. **Install the [latest version of IntelliJ IDEA](http://www.jetbrains.com/idea/download/index.html).**
+1. **Install the [latest version of IntelliJ IDEA](https://www.jetbrains.com/idea/download/index.html).**
 
 2. **Create your first backend application:**
    
@@ -120,7 +120,7 @@ Kotlin provides an ability to transpile your Kotlin code, the Kotlin standard li
 
 Here you'll learn how to develop and improve your frontend web application using [Kotlin/JS](js-overview.md).
 
-1. **Install the [latest version of IntelliJ IDEA](http://www.jetbrains.com/idea/download/index.html).**
+1. **Install the [latest version of IntelliJ IDEA](https://www.jetbrains.com/idea/download/index.html).**
 
 2. **Create your first frontend web application:**
 
@@ -137,6 +137,8 @@ Here you'll learn how to develop and improve your frontend web application using
    |[Ktor](https://ktor.io/) | The Kotlin multiplatform library for networking. |
    |[KVision](https://kvision.io/) | A third-party object-oriented web framework for Kotlin/JS.|
    |[fritz2](https://www.fritz2.dev/)| A third-party lightweight, high-performance, independent library for building reactive web apps in Kotlin that are heavily dependent on coroutines and flows.|
+   |[Doodle](https://nacular.github.io/doodle/) | A third-party vector-based UI framework that uses browser's capabilities to draw user interfaces.|
+   |[Compose for Web](https://jb.gg/compose-web) | Brings [Google’s Jetpack Compose UI toolkit](https://developer.android.com/jetpack/compose) to the browser. A _Technology Preview_ is currently available.|
    |[kotlin-wrappers](https://github.com/JetBrains/kotlin-wrappers) | Provide convenient abstractions and deep integrations for one of the most popular JavaScript frameworks. Kotlin wrappers also provide support for a number of adjacent technologies like `react-redux`, `react-router`, or `styled-components`. |
 
 4. **Learn more about Kotlin for frontend web development:**
@@ -172,7 +174,7 @@ Support for multiplatform programming is one of Kotlin’s key benefits. It redu
 
 Here you'll learn how to develop and publish a multiplatform library:
 
-1. **Install the [latest version of IntelliJ IDEA](http://www.jetbrains.com/idea/download/index.html).**
+1. **Install the [latest version of IntelliJ IDEA](https://www.jetbrains.com/idea/download/index.html).**
 
 2. **Create a multiplaform library:**
 

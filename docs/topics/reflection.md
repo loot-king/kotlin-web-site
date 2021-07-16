@@ -205,7 +205,8 @@ fun main() {
     ::y.set(2)
     println(y)
 }
-```       
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 
 A property reference can be used where a function with a single generic parameter is expected:
 
@@ -349,7 +350,7 @@ You don't need to specify `this` as the receiver: `this::foo` and `::foo` are eq
 
 ### Bound constructor references
 
-A bound callable reference to a constructor of an [*inner* class](nested-classes.md#inner-classes) can 
+A bound callable reference to a constructor of an [inner class](nested-classes.md#inner-classes) can 
 be obtained by providing an instance of the outer class:
 
 ```kotlin

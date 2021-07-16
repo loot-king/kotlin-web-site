@@ -306,7 +306,7 @@ To make adjustments to the configuration used by Karma, place your additional co
 called `karma.config.d` in the root of your project. All `.js` configuration files in this directory will be picked up
 and are automatically merged into the generated `karma.conf.js` at build time.
 
-All karma configuration abilities are well described in Karma's [documentation](http://karma-runner.github.io/5.0/config/configuration-file.html).
+All karma configuration abilities are well described in Karma's [documentation](https://karma-runner.github.io/5.0/config/configuration-file.html).
 
 ## webpack bundling
 
@@ -315,6 +315,14 @@ For browser targets, the Kotlin/JS plugin uses the widely known [webpack](https:
 ### webpack version 
 
 The Kotlin/JS plugin uses webpack %webpackMajorVersion%.
+
+If you have projects created with plugin versions earlier than 1.5.0,
+you can temporarily switch back to webpack %webpackPreviousMajorVersion% used in these versions by adding the following line
+to the project's `gradle.properties`:
+
+```properties
+kotlin.js.webpack.major.version=4
+```
 
 ### webpack task
 
@@ -384,7 +392,7 @@ The Kotlin/JS Gradle plugin also provides support for webpack's [CSS](https://we
 the [webpack configuration files](#webpack-bundling) that are used to build your project, the most commonly
 used settings are available directly from the `build.gradle(.kts)` file.
 
-To turn on CSS support in your project, set the `cssSupport.enabled` flag in the Gradle build file in the `commonWbpackConfig`
+To turn on CSS support in your project, set the `cssSupport.enabled` option in the Gradle build file in the `commonWbpackConfig`
 block. This configuration is also enabled by default when creating a new project using the wizard.
 
 ```groovy

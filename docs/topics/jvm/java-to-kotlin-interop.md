@@ -375,7 +375,7 @@ kotlin.jvm.JvmClassMappingKt.getKotlinClass(MainView.class)
 
 ## Handling signature clashes with @JvmName
 
-Sometimes we have a named function in Kotlin, for which we need a different JVM name in the byte code.
+Sometimes we have a named function in Kotlin, for which we need a different JVM name in the bytecode.
 The most prominent example happens due to *type erasure*:
 
 ```kotlin
@@ -472,9 +472,10 @@ And you want to call it from Java and catch the exception:
 
 // Java
 try {
-  demo.Example.writeToFile();
-} catch (IOException e) { // error: writeToFile() does not declare IOException in the throws list
-  // ...
+    demo.Example.writeToFile();
+} catch (IOException e) { 
+    // error: writeToFile() does not declare IOException in the throws list
+    // ...
 }
 ```
 
@@ -580,4 +581,3 @@ fun emptyList(): List<Nothing> = listOf()
 // is translated to
 // List emptyList() { ... }
 ```
-
