@@ -1,0 +1,137 @@
+[//]: # (title: Basic types)
+
+<no-index/>
+
+
+Every variable and data structure in Kotlin has a type. Types are important because they tell the compiler what you are allowed to 
+do with that variable or data structure. In other words, what functions and properties it has.
+
+In the last chapter, Kotlin was able to tell in the previous example that `customers` has type [`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/).
+Kotlin's ability to **infer** the type is called **type inference**. `customers` is assigned an integer
+value. From this, Kotlin infers that `customers` has a numerical type `Int`. As a result, the compiler knows that you
+can perform arithmetic operations with `customers`:
+
+```kotlin
+fun main() {
+//sampleStart
+    var customers = 10
+
+    // Some customers leave the queue
+    customers = 8
+
+    customers = customers + 3 // Example of addition: 11
+    customers += 7            // Example of addition: 18
+    customers -= 3            // Example of subtraction: 15
+    customers *= 2            // Example of multiplication: 30
+    customers /= 3            // Example of division: 10
+
+    println(customers) // 10
+//sampleEnd
+}
+```
+{kotlin-runnable="true" id="kotlin-tour-basic-types-arithmetic"}
+
+> `+=`, `-=`, `*=`, `/=`, and `%=` are augmented assignment operators. For more information, see [Augmented assignments](operator-overloading.md#augmented-assignments).
+> 
+{style="tip"}
+
+In total, Kotlin has the following basic types:
+
+| **Category**                                              | **Basic types**                    | **Example code**                                                  |
+|-----------------------------------------------------------|------------------------------------|-------------------------------------------------------------------|
+| [Integers](numbers.md#integer-types)                      | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`<br/> `val amount: Long = 350_000_000`      |
+| [Unsigned integers](unsigned-integer-types.md)            | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                          |
+| [Floating-point numbers](numbers.md#floating-point-types) | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`<br/> `val price: Double = 19.99` |
+| [Booleans](booleans.md)                                   | `Boolean`                          | `val isEnabled: Boolean = true`                                   |
+| [Characters](characters.md)                               | `Char`                             | `val separator: Char = ','`                                       |
+| [Strings](strings.md)                                     | `String`                           | `val message: String = "Hello, world!"`                           |
+
+For more information on basic types and their properties, see [Types overview](types-overview.md).
+
+With this knowledge, you can declare variables and initialize them later. Kotlin can manage this as long as variables
+are initialized before the first read.
+
+To declare a variable without initializing it, specify its type with `:`. For example:
+
+```kotlin
+fun main() {
+//sampleStart
+    // Variable declared without initialization
+    val d: Int
+    // Variable initialized
+    d = 3
+
+    // Variable explicitly typed and initialized
+    val e: String = "hello"
+
+    // Variables can be read because they have been initialized
+    println(d) // 3
+    println(e) // hello
+//sampleEnd
+}
+```
+{kotlin-runnable="true" id="kotlin-tour-basic-types-initialization"}
+
+If you don't initialize a variable before it is read, you see an error:
+
+```kotlin
+fun main() {
+//sampleStart
+    // Variable declared without initialization
+    val d: Int
+    
+    // Triggers an error
+    println(d)
+    // Variable 'd' must be initialized
+//sampleEnd
+}
+```
+{kotlin-runnable="true" id="kotlin-tour-basic-types-no-initialization" validate="false"}
+
+Now that you know how to declare basic types, it's time to learn about [collections](kotlin-tour-collections.md).
+
+## Practice {completion-point="true"}
+
+<deflist appearance="clear" collapsible="true">
+<def title="Declare explicit types for variables" id="basic-types-exercise-1">
+
+Explicitly declare the correct type for each variable:
+
+```kotlin
+fun main() {
+    val a: Int = 1000 
+    val b = "log message"
+    val c = 3.14
+    val d = 100_000_000_000_000
+    val e = false
+    val f = '\n'
+}
+```
+{validate="false" kotlin-runnable="true" id="kotlin-tour-basic-types-exercise"}
+
+```kotlin
+fun main() {
+    val a: Int = 1000
+    val b: String = "log message"
+    val c: Double = 3.14
+    val d: Long = 100_000_000_000_000
+    val e: Boolean = false
+    val f: Char = '\n'
+}
+```
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="Example solution" id="kotlin-tour-basic-types-solution"}
+
+</def>
+</deflist>
+
+<seealso></seealso>
+
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-hello-world.md" mode="outline" icon="arrow-left" icon-position="left">Previous step</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-collections.md" mode="classic" icon="arrow-right" icon-position="right">Next step</a>
+  </li>
+</list>
+

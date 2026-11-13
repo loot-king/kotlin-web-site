@@ -1,10 +1,10 @@
 [//]: # (title: Calling Java from Kotlin)
+[//]: # (description: Learn how to call Java code from Kotlin, including getters and setters, null-safety and platform types, nullability annotations, mapped types, and SAM conversions.)
 
 Kotlin is designed with Java interoperability in mind. Existing Java code can be called from Kotlin in a natural way,
-and Kotlin code can be used from Java rather smoothly as well.
-In this section, we describe some details about calling Java code from Kotlin.
+and Kotlin code can be used from Java as well.
 
-Pretty much all Java code can be used without any issues:
+You can use most Java code without additional configuration:
 
 ```kotlin
 import java.util.*
@@ -16,7 +16,7 @@ fun demo(source: List<Int>) {
         list.add(item)
     }
     // Operator conventions work as well:
-    for (i in 0..source.size - 1) {
+    for (i in 0..<source.size) {
         list[i] = source[i] // get and set are called
     }
 }
@@ -25,7 +25,8 @@ fun demo(source: List<Int>) {
 ## Getters and setters
 
 Methods that follow the Java conventions for getters and setters (no-argument methods with names starting with `get`
-and single-argument methods with names starting with `set`) are represented as properties in Kotlin.
+and single-argument methods with names starting with `set`) are represented as properties in Kotlin. Such properties are 
+also called _synthetic properties_. 
 `Boolean` accessor methods (where the name of the getter starts with `is` and the name of the setter starts with `set`)
 are represented as properties which have the same name as the getter method.
 
@@ -34,47 +35,109 @@ import java.util.Calendar
 
 fun calendarDemo() {
     val calendar = Calendar.getInstance()
-    if (calendar.firstDayOfWeek == Calendar.SUNDAY) { // call getFirstDayOfWeek()
-        calendar.firstDayOfWeek = Calendar.MONDAY // call setFirstDayOfWeek()
+    if (calendar.firstDayOfWeek == Calendar.SUNDAY) { // Calls getFirstDayOfWeek()
+        calendar.firstDayOfWeek = Calendar.MONDAY     // Calls setFirstDayOfWeek()
     }
-    if (!calendar.isLenient) { // call isLenient()
-        calendar.isLenient = true // call setLenient()
+    if (!calendar.isLenient) {    // Calls isLenient()
+        calendar.isLenient = true // Calls setLenient()
     }
 }
 ```
 
-Note that, if the Java class only has a setter, it isn't visible as a property in Kotlin because Kotlin doesn't support
+`calendar.firstDayOfWeek` above is an example of a synthetic property.
+
+Note that if the Java class only has a setter, it isn't visible as a property in Kotlin because Kotlin doesn't support
 set-only properties.
 
-## Methods returning void
+Only no-argument getters are represented as synthetic properties. If the getter has an overload that takes
+arguments, that overload isn't exposed as a property and in most cases you call it using its full method name. Consider
+the following Java class:
 
-If a Java method returns `void`, it will return `Unit` when called from Kotlin.
-If by any chance someone uses that return value, it will be assigned at the call site by the Kotlin compiler
-since the value itself is known in advance (being `Unit`).
+```java
+// Java
+public class Greeting {
+    public String getMessage() {
+        return "Hello!";
+    }
+
+    public String getMessage(String name) {
+        return "Hello, " + name + "!";
+    }
+}
+```
+
+The no-argument `getMessage()` method is available through the synthetic `message` property. To use the overloaded
+`getMessage(String)` method, call it as a function:
+
+```kotlin
+// Kotlin
+fun main() {
+    val greeting = Greeting()
+    println(greeting.message)              // Accesses getMessage() through the synthetic property
+    println(greeting.getMessage("Kotlin")) // Calls the overloaded getMessage(String) method
+}
+```
+
+Calling `greeting.message("Kotlin")` doesn't compile and returns an unresolved reference error (receiver type mismatch)
+because the `message` property doesn't accept arguments.
+
+However, in some cases, when a Java method with parameters overrides the getter of a Kotlin
+[member extension property](extensions.md#declaring-extensions-as-members), Kotlin treats the method as a
+property. So you can only call it as a property within the receiver's scope and not by its method name:
+
+```java
+// Java
+public class Greeter implements Message {
+    public String getText(String name) {
+        return "Hello, " + name + "!";
+    }
+}
+```
+
+```kotlin
+// Kotlin
+interface Message {
+    val String.text: String
+}
+
+fun demo(greeter: Greeter) {
+    greeter.getText("Kotlin")       // Error: unresolved reference
+    with(greeter) { "Kotlin".text } // Accesses getText(String) through the member extension property
+}
+```
+
+## Methods returning `void`
+
+If a Java method returns `void`, its return type becomes `Unit` when called from Kotlin. If you use the return value,
+the Kotlin compiler assigns `Unit` at the call site, since the value is known in advance.
 
 ## Escaping for Java identifiers that are keywords in Kotlin
 
-Some of the Kotlin keywords are valid identifiers in Java: `in`, `object`, `is`, and other.
-If a Java library uses a Kotlin keyword for a method, you can still call the method
-escaping it with the backtick (`) character:
+Some of the Kotlin keywords are valid identifiers in Java: `in`, `object`, `is`, and others. If a Java library uses a
+Kotlin keyword for a method, you can still call the method escaping it with the backtick (`) character:
 
 ```kotlin
-foo.`is`(bar)
+matcher.`is`(expected)
 ```
 
 ## Null-safety and platform types
 
 Any reference in Java may be `null`, which makes Kotlin's requirements of strict null-safety impractical for objects coming from Java.
-Types of Java declarations are treated in Kotlin in a specific manner and called *platform types*. Null-checks are relaxed
-for such types, so that safety guarantees for them are the same as in Java (see more [below](#mapped-types)).
+Types of Java declarations are treated in Kotlin as non-denotable and called [_platform types_](https://kotlinlang.org/spec/type-system.html#platform-types).
+You can't write the non-denotable types in the code explicitly. Therefore, when a platform value is assigned to a Kotlin
+variable, you can: 
 
+* Rely on the type inference. In this case, the variable has an inferred platform type.
+* Choose the type you expect. Kotlin allows both nullable and non-nullable types.
+
+Null checks are relaxed for platform types, so they have the same safety guarantees as [mapped Java types](#mapped-types).
 Consider the following examples:
 
 ```kotlin
-val list = ArrayList<String>() // non-null (constructor result)
+val list = ArrayList<String>() // Non-null (constructor result)
 list.add("Item")
-val size = list.size // non-null (primitive int)
-val item = list[0] // platform type inferred (ordinary Java object)
+val size = list.size // Non-null (primitive int)
+val item = list[0] // Platform type inferred (ordinary Java object)
 ```
 
 When you call methods on variables of platform types, Kotlin does not issue nullability errors at compile time,
@@ -82,57 +145,86 @@ but the call may fail at runtime, because of a null-pointer exception or an asse
 prevent nulls from propagating:
 
 ```kotlin
-item.substring(1) // allowed, may throw an exception if item == null
+item.substring(1) // Allowed, throws an exception if item == null
 ```
 
-Platform types are *non-denotable*, meaning that you can't write them down explicitly in the language.
-When a platform value is assigned to a Kotlin variable, you can rely on the type inference (the variable will have an inferred
-platform type then, as `item` has in the example above), or you can choose the type you expect (both nullable and non-null types are allowed):
+You can assign a value of a platform type to a variable of both nullable and non-nullable Kotlin types. However,
+if you assign such a value to a variable of a non-nullable type and the value is actually `null` at runtime, Kotlin
+throws a `NullPointerException`. To avoid this, add explicit nullability to your Kotlin code:
 
 ```kotlin
-val nullable: String? = item // allowed, always works
-val notNull: String = item // allowed, may fail at runtime
+val nullable: String? = item // Allowed, always works
+val notNull: String = item // Allowed, may fail at runtime
 ```
 
-If you choose a non-null type, the compiler will emit an assertion upon assignment. This prevents Kotlin's non-null variables from holding
+If you choose a non-nullable type, the compiler will emit an assertion upon assignment. This prevents Kotlin's non-nullable variables from holding
 nulls. Assertions are also emitted when you pass platform values to Kotlin functions expecting non-null values and in other cases.
-Overall, the compiler does its best to prevent nulls from propagating far through the program although sometimes this is
+Overall, the compiler does its best to prevent nulls from propagating far through the program, although sometimes this is
 impossible to eliminate entirely, because of generics.
 
 ### Notation for platform types
 
-As mentioned above, platform types can't be mentioned explicitly in the program, so there's no syntax for them in the language.
-Nevertheless, the compiler and IDE need to display them sometimes (for example, in error messages or parameter info), 
-so there is a mnemonic notation for them:
+As mentioned in the previous section, platform types can't be mentioned explicitly in the program, so there's no syntax
+for them in the language. Nevertheless, the compiler and IDE need to display them sometimes (for example, in error messages
+or parameter info), so there is a mnemonic notation for them:
 
-* `T!` means "`T` or `T?`",
-* `(Mutable)Collection<T>!` means "Java collection of `T` may be mutable or not, may be nullable or not",
+* `T!` means "`T` or `T?`"
+* `(Mutable)Collection<T>!` means "Java collection of `T` may be mutable or not, may be nullable or not"
 * `Array<(out) T>!` means "Java array of `T` (or a subtype of `T`), nullable or not"
+
+When you see this notation in an error message or IDE tooltip, add an explicit type annotation to your Kotlin variable
+to restore null-safety checks or eliminate platform types at the source using nullability annotations.
 
 ### Nullability annotations
 
-Java types that have nullability annotations are represented not as platform types, but as actual nullable or non-null
+Java types that have nullability annotations are represented not as platform types, but as actual nullable or non-nullable
 Kotlin types. The compiler supports several flavors of nullability annotations, including:
 
-  * [JetBrains](https://www.jetbrains.com/idea/help/nullable-and-notnull-annotations.html)
-(`@Nullable` and `@NotNull` from the `org.jetbrains.annotations` package)
-  * [JSpecify](https://jspecify.dev/) (`org.jspecify.nullness`)
-  * Android (`com.android.annotations` and `android.support.annotations`)
-  * JSR-305 (`javax.annotation`, more details below)
-  * FindBugs (`edu.umd.cs.findbugs.annotations`)
-  * Eclipse (`org.eclipse.jdt.annotation`)
-  * Lombok (`lombok.NonNull`)
-  * RxJava 3 (`io.reactivex.rxjava3.annotations`)
+* [JetBrains](https://www.jetbrains.com/idea/help/nullable-and-notnull-annotations.html)
+  (`@Nullable` and `@NotNull` from the `org.jetbrains.annotations` package)
+* [JSpecify](#jspecify-support) (`org.jspecify.annotations`)
+* Android (`com.android.annotations`, `android.support.annotation`, `androidx.annotation`, `android.annotation`)
+* [JSR-305](#jsr-305-support) (`javax.annotation`)
+* FindBugs (`edu.umd.cs.findbugs.annotations`)
+* Eclipse (`org.eclipse.jdt.annotation`)
+* [Lombok](lombok.md) (`lombok.NonNull`)
+* RxJava 3 (`io.reactivex.rxjava3.annotations`)
+* [Vert.x](https://vertx.io/) (`io.vertx.codegen.annotations`)
 
-You can specify whether the compiler reports a nullability mismatch based on the information from specific types of 
-nullability annotations. Use the compiler option `-Xnullability-annotations=@<package-name>:<report-level>`. 
-In the argument, specify the fully qualified nullability annotations package and one of these report levels:
+You can instruct the compiler to report nullability mismatches for specific nullability annotations with the following compiler option:
+
+```bash
+-Xnullability-annotations=@<package-name>:<report-level>
+``` 
+
+Specify the package name for the fully qualified nullability annotations and one of these report levels:
+
 * `ignore` to ignore nullability mismatches
 * `warn` to report warnings
 * `strict` to report errors.
 
-See the full list of supported nullability annotations in the 
+> [JSpecify](#jspecify-support) is the only supported flavor that uses `strict` report level by default.
+> Use it to report errors on nullability annotations without additional configuration.
+>
+{style="note"}
+
+See the full list of supported nullability annotations in the
 [Kotlin compiler source code](https://github.com/JetBrains/kotlin/blob/master/core/compiler.common.jvm/src/org/jetbrains/kotlin/load/java/JvmAnnotationNames.kt).
+
+### Mutability annotations
+
+You can annotate a Java declaration with a mutability annotation to specify whether a returned collection is read-only or mutable in Kotlin.
+If you assign the value to a collection type with different mutability, the compiler reports a type mismatch.
+The diagnostic severity depends on the specific mutability annotation.
+
+The compiler supports several mutability annotations, including:
+
+* `kotlin.annotations.jvm.ReadOnly`
+* `kotlin.annotations.jvm.Mutable`
+* `org.jetbrains.annotations.Unmodifiable`
+* `org.jetbrains.annotations.UnmodifiableView`
+
+See the full list of supported mutability annotations in the [Kotlin compiler source code](https://github.com/JetBrains/kotlin/blob/master/core/compiler.common.jvm/src/org/jetbrains/kotlin/load/java/JvmAnnotationNames.kt).
 
 ### Annotating type arguments and type parameters
 
@@ -140,7 +232,7 @@ You can annotate the type arguments and type parameters of generic types to prov
 
 > All examples in the section use JetBrains nullability annotations from the `org.jetbrains.annotations` package.
 >
-{type="note"}
+{style="note"}
 
 #### Type arguments
 
@@ -180,13 +272,13 @@ In the Kotlin code, passing the instance of `Derived` where the `Base<String>` i
 fun takeBaseOfNotNullStrings(x: Base<String>) {}
 
 fun main() {
-    takeBaseOfNotNullStrings(Derived()) // warning: nullability mismatch
+    takeBaseOfNotNullStrings(Derived()) // Warning: nullability mismatch
 }
 ```
 
 The upper bound of `Derived` is set to `Base<String?>`, which is different from `Base<String>`.
 
-Learn more about [Java generics in Kotlin](java-interop.md#java-generics-in-kotlin).
+Learn more about [Java generics in Kotlin](#java-generics-in-kotlin).
 
 #### Type parameters
 
@@ -201,7 +293,7 @@ When inheriting from `Base`, Kotlin expects a non-nullable type argument or type
 Thus, the following Kotlin code produces a warning:
 
 ```kotlin
-class Derived<K> : Base<K> {} // warning: K has undefined nullability
+class Derived<K> : Base<K> {} // Warning: K has undefined nullability
 ```
 
 You can fix it by specifying the upper bound `K : Any`.
@@ -221,27 +313,85 @@ class BaseWithBound<T : Number> {}
 So passing nullable type as a type argument or type parameter produces a warning.
 
 Annotating type arguments and type parameters works with the Java 8 target or higher. The feature requires that the 
-nullability annotations support the `TYPE_USE` target (`org.jetbrains.annotations` supports this in version 15 and above). 
-Pass the `-Xtype-enhancement-improvements-strict-mode` compiler option to report errors in Kotlin code that uses 
-nullability which deviates from the nullability annotations from Java.
+nullability annotations support the `TYPE_USE` target (`org.jetbrains.annotations` supports this in version 15 and above).
 
-> Note: If a nullability annotation supports other targets that are applicable to a type in addition to the `TYPE_USE` target, then
+> If a nullability annotation supports other targets that are applicable to a type in addition to the `TYPE_USE` target,
 > `TYPE_USE` takes priority. For example, if `@Nullable` has both `TYPE_USE` and `METHOD` targets, the Java method
 > signature `@Nullable String[] f()` becomes `fun f(): Array<String?>!` in Kotlin.
 >
-{type="note"}
+{style="note"}
+
+### JSpecify support
+
+Kotlin supports the [JSpecify](https://jspecify.dev/) nullability annotations, which provide a unified set of annotations
+for Java nullability. JSpecify allows you to provide detailed nullability information for Java declarations,
+helping Kotlin maintain null-safety when working with Java code.
+
+Kotlin supports the following annotations in the `org.jspecify.annotations` package:
+
+* `@Nullable` marks a type as nullable.
+* `@NonNull` marks a type as non-nullable.
+* `@NullMarked` marks all types within a scope, for example a class or package, as non-nullable by default unless annotated
+  otherwise.
+
+  This annotation doesn't apply to local variables and [type variables (generics)](https://jspecify.dev/docs/user-guide/#using-type-variables-in-generic-types).
+  Type variables remain "null-agnostic" until a specific nullable or non-nullable type is provided.
+
+* `@NullUnmarked` reverses the effect of `@NullMarked`, making all types within the scope as [platform types](#null-safety-and-platform-types).
+
+Consider the following Java class with JSpecify annotations:
+ 
+```java
+// Java
+import org.jspecify.annotations.*;
+
+@NullMarked
+public class InventoryService {
+    public String notNull() { return ""; }
+    public @Nullable String nullable() { return null; }
+}
+```
+ 
+In Kotlin, these are treated as regular nullable and non-nullable types rather than [platform types](#null-safety-and-platform-types):
+ 
+```kotlin
+// Kotlin
+fun test(inventory: InventoryService) {
+    inventory.notNull().length  // OK
+    inventory.nullable().length // Error: only safe (?.) or non-null asserted (!!) calls are allowed
+}
+```
+
+By default, the Kotlin compiler reports nullability mismatches for JSpecify annotations as errors.
+You can customize the severity of JSpecify nullability diagnostics using the following compiler option:
+
+```bash
+-Xjspecify-annotations=<report-level>
+```
+
+Available report levels are:
+
+| Level    | Description                                          |
+|----------|------------------------------------------------------|
+| `strict` | Reports errors for nullability mismatches (default). |
+| `warn`   | Reports warnings.                                    |
+| `ignore` | Ignores nullability mismatches.                      |
+
+> For more information on JSpecify annotations, see the [JSpecify user guide](https://jspecify.dev/docs/user-guide).
+> 
+{type="tip"}
 
 ### JSR-305 support
 
 The [`@Nonnull`](https://www.javadoc.io/doc/com.google.code.findbugs/jsr305/latest/javax/annotation/Nonnull.html) annotation defined
 in [JSR-305](https://jcp.org/en/jsr/detail?id=305) is supported for denoting nullability of Java types.
 
-If the `@Nonnull(when = ...)` value is `When.ALWAYS`, the annotated type is treated as non-null; `When.MAYBE` and
+If the `@Nonnull(when = ...)` value is `When.ALWAYS`, the annotated type is treated as non-nullable; `When.MAYBE` and
 `When.NEVER` denote a nullable type; and `When.UNKNOWN` forces the type to be [platform one](#null-safety-and-platform-types).
 
-A library can be compiled against the JSR-305 annotations, but there's no need to make the annotations artifact (e.g. `jsr305.jar`)
-a compile dependency for the library consumers. The Kotlin compiler can read the JSR-305 annotations from a library
-without the annotations present on the classpath.
+A library can be compiled against the JSR-305 annotations, but there's no need to make the artifact with annotations
+(for example, `jsr305.jar`) a compile dependency for the library consumers. The Kotlin compiler can read the JSR-305
+annotations from a library without the annotations present on the classpath.
 
 [Custom nullability qualifiers (KEEP-79)](https://github.com/Kotlin/KEEP/blob/master/proposals/jsr-305-custom-nullability-qualifiers.md)
 are also supported (see below).
@@ -261,17 +411,17 @@ public @interface MyNonnull {
 }
 
 @TypeQualifierNickname
-@CheckForNull // a nickname to another type qualifier nickname
+@CheckForNull // A nickname for another type qualifier nickname
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MyNullable {
 }
 
 interface A {
     @MyNullable String foo(@MyNonnull String x);
-    // in Kotlin (strict mode): `fun foo(x: String): String?`
+    // In Kotlin (strict mode): `fun foo(x: String): String?`
 
     String bar(List<@MyNonnull String> x);
-    // in Kotlin (strict mode): `fun bar(x: List<String>!): String!`
+    // In Kotlin (strict mode): `fun bar(x: List<String>!): String!`
 }
 ```
 
@@ -306,31 +456,31 @@ public @interface NullableApi {
 
 @NullableApi
 interface A {
-    String foo(String x); // fun foo(x: String?): String?
+    String foo(String x); // In Kotlin: fun foo(x: String?): String?
 
-    @NotNullApi // overriding default from the interface
-    String bar(String x, @Nullable String y); // fun bar(x: String, y: String?): String
+    @NonNullApi // Overriding default from the interface
+    String bar(String x, @Nullable String y); // In Kotlin: fun bar(x: String, y: String?): String
 
     // The List<String> type argument is seen as nullable because of `@NullableApi`
     // having the `TYPE_USE` element type:
-    String baz(List<String> x); // fun baz(List<String?>?): String?
+    String baz(List<String> x); // In Kotlin: fun baz(List<String?>?): String?
 
     // The type of `x` parameter remains platform because there's an explicit
     // UNKNOWN-marked nullability annotation:
-    String qux(@Nonnull(when = When.UNKNOWN) String x); // fun baz(x: String!): String?
+    String qux(@Nonnull(when = When.UNKNOWN) String x); // In Kotlin: fun qux(x: String!): String?
 }
 ```
 
 > The types in this example only take place with the strict mode enabled; otherwise, the platform types remain.
->See the [`@UnderMigration` annotation](#undermigration-annotation) and [Compiler configuration](#compiler-configuration) sections.
+> See the [`@UnderMigration` annotation](#undermigration-annotation) and [Compiler configuration](#compiler-configuration) sections.
 >
-{type="note"}
+{style="note"}
 
 Package-level default nullability is also supported:
 
 ```java
 // FILE: test/package-info.java
-@NonNullApi // declaring all types in package 'test' as non-nullable by default
+@NonNullApi // Declaring all types in package 'test' as non-nullable by default
 package test;
 ```
 
@@ -357,47 +507,45 @@ A library maintainer can add `@UnderMigration` status to both type qualifier nic
 public @interface NonNullApi {
 }
 
-// The types in the class are non-null, but only warnings are reported
+// The types in the class are non-nullable, but only warnings are reported
 // because `@NonNullApi` is annotated `@UnderMigration(status = MigrationStatus.WARN)`
 @NonNullApi
 public class Test {}
 ```
 
->The migration status of a nullability annotation is not inherited by its type qualifier nicknames but is applied
->to its usages in default type qualifiers.
+> The migration status of a nullability annotation is not inherited by its type qualifier nicknames but is applied
+> to its usages in default type qualifiers.
 >
-{type="note"}
+{style="note"}
 
 If a default type qualifier uses a type qualifier nickname and they are both `@UnderMigration`, the status
 from the default type qualifier is used.
 
 #### Compiler configuration
 
-The JSR-305 checks can be configured by adding the `-Xjsr305` compiler flag with the following options (and their combination):
+The JSR-305 checks can be configured by adding the `-Xjsr305` compiler option with the following values (and their combination):
 
 * `-Xjsr305={strict|warn|ignore}` to set up the behavior for non-`@UnderMigration` annotations.
-Custom nullability qualifiers, especially
-`@TypeQualifierDefault`, are already spread among many well-known libraries, and users may need to migrate smoothly when
-updating to the Kotlin version containing JSR-305 support. Since Kotlin 1.1.60, this flag only affects non-`@UnderMigration` annotations.
-
+  Custom nullability qualifiers, especially `@TypeQualifierDefault`, are already spread among many well-known libraries,
+  and users may need to migrate smoothly when updating to the Kotlin version containing JSR-305 support.
+  This option only affects non-`@UnderMigration` annotations.
 * `-Xjsr305=under-migration:{strict|warn|ignore}` to override the behavior for the `@UnderMigration` annotations.
-Users may have different view on the migration status for the libraries:
-they may want to have errors while the official migration status is `WARN`, or vice versa,
-they may wish to postpone errors reporting for some until they complete their migration.
-
+  Users may have different view on the migration status for the libraries:
+  they may want to have errors while the official migration status is `WARN`, or vice versa,
+  they may wish to postpone errors reporting for some until they complete their migration.
 * `-Xjsr305=@<fq.name>:{strict|warn|ignore}` to override the behavior for a single annotation, where `<fq.name>`
-is the fully qualified class name of the annotation. May appear several times for different annotations. This is useful
-for managing the migration state for a particular library.
+  is the fully qualified class name of the annotation. May appear several times for different annotations.
+  This is useful for managing the migration state for a particular library.
 
 The `strict`, `warn` and `ignore` values have the same meaning as those of `MigrationStatus`,
 and only the `strict` mode affects the types in the annotated declarations as they are seen in Kotlin.
 
-> Note: the built-in JSR-305 annotations [`@Nonnull`](https://www.javadoc.io/doc/com.google.code.findbugs/jsr305/latest/javax/annotation/Nonnull.html),
->[`@Nullable`](https://www.javadoc.io/doc/com.google.code.findbugs/jsr305/3.0.1/javax/annotation/Nullable.html) and
->[`@CheckForNull`](https://www.javadoc.io/doc/com.google.code.findbugs/jsr305/latest/javax/annotation/CheckForNull.html) are always enabled and
->affect the types of the annotated declarations in Kotlin, regardless of compiler configuration with the `-Xjsr305` flag.
+> The built-in JSR-305 annotations [`@Nonnull`](https://www.javadoc.io/doc/com.google.code.findbugs/jsr305/latest/javax/annotation/Nonnull.html),
+> [`@Nullable`](https://www.javadoc.io/doc/com.google.code.findbugs/jsr305/3.0.1/javax/annotation/Nullable.html), and
+> [`@CheckForNull`](https://www.javadoc.io/doc/com.google.code.findbugs/jsr305/latest/javax/annotation/CheckForNull.html) are always enabled and
+> affect the types of the annotated declarations in Kotlin, regardless of compiler configuration with the `-Xjsr305` option.
 >
-{type="note"}
+{style="note"}
 
 For example, adding `-Xjsr305=ignore -Xjsr305=under-migration:ignore -Xjsr305=@org.library.MyNullable:warn` to the
 compiler arguments makes the compiler generate warnings for inappropriate usages of types annotated by
@@ -410,7 +558,7 @@ The default behavior is the same to `-Xjsr305=warn`. The
 
 Kotlin treats some Java types specifically. Such types are not loaded from Java "as is", but are _mapped_ to corresponding Kotlin types.
 The mapping only matters at compile time, the runtime representation remains unchanged.
- Java's primitive types are mapped to corresponding Kotlin types (keeping [platform types](#null-safety-and-platform-types) in mind):
+Java's primitive types are mapped to corresponding Kotlin types (keeping [platform types](#null-safety-and-platform-types) in mind):
 
 | **Java type** | **Kotlin type**  |
 |---------------|------------------|
@@ -425,30 +573,30 @@ The mapping only matters at compile time, the runtime representation remains unc
 
 Some non-primitive built-in classes are also mapped:
 
-| **Java type** | **Kotlin type**  |
-|---------------|------------------|
-| `java.lang.Object`       | `kotlin.Any!`    |
-| `java.lang.Cloneable`    | `kotlin.Cloneable!`    |
-| `java.lang.Comparable`   | `kotlin.Comparable!`    |
-| `java.lang.Enum`         | `kotlin.Enum!`    |
-| `java.lang.annotation.Annotation`   | `kotlin.Annotation!`    |
-| `java.lang.CharSequence` | `kotlin.CharSequence!`   |
-| `java.lang.String`       | `kotlin.String!`   |
-| `java.lang.Number`       | `kotlin.Number!`     |
-| `java.lang.Throwable`    | `kotlin.Throwable!`    |
+| **Java type**                     | **Kotlin type**        |
+|-----------------------------------|------------------------|
+| `java.lang.Object`                | `kotlin.Any!`          |
+| `java.lang.Cloneable`             | `kotlin.Cloneable!`    |
+| `java.lang.Comparable`            | `kotlin.Comparable!`   |
+| `java.lang.Enum`                  | `kotlin.Enum!`         |
+| `java.lang.annotation.Annotation` | `kotlin.Annotation!`   |
+| `java.lang.CharSequence`          | `kotlin.CharSequence!` |
+| `java.lang.String`                | `kotlin.String!`       |
+| `java.lang.Number`                | `kotlin.Number!`       |
+| `java.lang.Throwable`             | `kotlin.Throwable!`    |
 
 Java's boxed primitive types are mapped to nullable Kotlin types:
 
-| **Java type**           | **Kotlin type**  |
-|-------------------------|------------------|
-| `java.lang.Byte`        | `kotlin.Byte?`   |
-| `java.lang.Short`       | `kotlin.Short?`  |
-| `java.lang.Integer`     | `kotlin.Int?`    |
-| `java.lang.Long`        | `kotlin.Long?`   |
-| `java.lang.Character`   | `kotlin.Char?`   |
-| `java.lang.Float`       | `kotlin.Float?`  |
-| `java.lang.Double`      | `kotlin.Double?`  |
-| `java.lang.Boolean`     | `kotlin.Boolean?` |
+| **Java type**         | **Kotlin type**   |
+|-----------------------|-------------------|
+| `java.lang.Byte`      | `kotlin.Byte?`    |
+| `java.lang.Short`     | `kotlin.Short?`   |
+| `java.lang.Integer`   | `kotlin.Int?`     |
+| `java.lang.Long`      | `kotlin.Long?`    |
+| `java.lang.Character` | `kotlin.Char?`    |
+| `java.lang.Float`     | `kotlin.Float?`   |
+| `java.lang.Double`    | `kotlin.Double?`  |
+| `java.lang.Boolean`   | `kotlin.Boolean?` |
 
 Note that a boxed primitive type used as a type parameter is mapped to a platform type:
 for example, `List<java.lang.Integer>` becomes a `List<Int!>` in Kotlin.
@@ -456,28 +604,28 @@ for example, `List<java.lang.Integer>` becomes a `List<Int!>` in Kotlin.
 Collection types may be read-only or mutable in Kotlin, so Java's collections are mapped as follows
 (all Kotlin types in this table reside in the package `kotlin.collections`):
 
-| **Java type** | **Kotlin read-only type**  | **Kotlin mutable type** | **Loaded platform type** |
-|---------------|----------------------------|-------------------------|--------------------------|
-| `Iterator<T>`        | `Iterator<T>`        | `MutableIterator<T>`            | `(Mutable)Iterator<T>!`            |
-| `Iterable<T>`        | `Iterable<T>`        | `MutableIterable<T>`            | `(Mutable)Iterable<T>!`            |
-| `Collection<T>`      | `Collection<T>`      | `MutableCollection<T>`          | `(Mutable)Collection<T>!`          |
-| `Set<T>`             | `Set<T>`             | `MutableSet<T>`                 | `(Mutable)Set<T>!`                 |
-| `List<T>`            | `List<T>`            | `MutableList<T>`                | `(Mutable)List<T>!`                |
-| `ListIterator<T>`    | `ListIterator<T>`    | `MutableListIterator<T>`        | `(Mutable)ListIterator<T>!`        |
-| `Map<K, V>`          | `Map<K, V>`          | `MutableMap<K, V>`              | `(Mutable)Map<K, V>!`              |
-| `Map.Entry<K, V>`    | `Map.Entry<K, V>`    | `MutableMap.MutableEntry<K,V>` | `(Mutable)Map.(Mutable)Entry<K, V>!` |
+| **Java type**     | **Kotlin read-only type** | **Kotlin mutable type**        | **Loaded platform type**             |
+|-------------------|---------------------------|--------------------------------|--------------------------------------|
+| `Iterator<T>`     | `Iterator<T>`             | `MutableIterator<T>`           | `(Mutable)Iterator<T>!`              |
+| `Iterable<T>`     | `Iterable<T>`             | `MutableIterable<T>`           | `(Mutable)Iterable<T>!`              |
+| `Collection<T>`   | `Collection<T>`           | `MutableCollection<T>`         | `(Mutable)Collection<T>!`            |
+| `Set<T>`          | `Set<T>`                  | `MutableSet<T>`                | `(Mutable)Set<T>!`                   |
+| `List<T>`         | `List<T>`                 | `MutableList<T>`               | `(Mutable)List<T>!`                  |
+| `ListIterator<T>` | `ListIterator<T>`         | `MutableListIterator<T>`       | `(Mutable)ListIterator<T>!`          |
+| `Map<K, V>`       | `Map<K, V>`               | `MutableMap<K, V>`             | `(Mutable)Map<K, V>!`                |
+| `Map.Entry<K, V>` | `Map.Entry<K, V>`         | `MutableMap.MutableEntry<K,V>` | `(Mutable)Map.(Mutable)Entry<K, V>!` |
 
-Java's arrays are mapped as mentioned [below](java-interop.md#java-arrays):
+Java's arrays are mapped as mentioned [below](#java-arrays):
 
-| **Java type** | **Kotlin type**  |
-|---------------|------------------|
-| `int[]`       | `kotlin.IntArray!` |
-| `String[]`    | `kotlin.Array<(out) String>!` |
+| **Java type** | **Kotlin type**                |
+|---------------|--------------------------------|
+| `int[]`       | `kotlin.IntArray!`             |
+| `String[]`    | `kotlin.Array<(out) String!>!` |
 
->The static members of these Java types are not directly accessible on the [companion objects](object-declarations.md#companion-objects)
->of the Kotlin types. To call them, use the full qualified names of the Java types, e.g. `java.lang.Integer.toHexString(foo)`.
+> The static members of these Java types aren't directly accessible on the [companion objects](object-declarations.md#companion-objects)
+> of the Kotlin types. To call them, [use the fully qualified names of the Java types](#accessing-static-members), for example, `java.lang.Integer.toHexString(255)`.
 >
-{type="note"}
+{style="note"}
 
 ## Java generics in Kotlin
 
@@ -498,8 +646,8 @@ Kotlin only allows `is`-checks for star-projected generic types:
 
 ```kotlin
 if (a is List<Int>) // Error: cannot check if it is really a List of Ints
-// but
-if (a is List<*>) // OK: no guarantees about the contents of the list
+// But
+if (a is List<*>)   // OK: no guarantees about the contents of the list
 ```
 
 ## Java arrays
@@ -518,7 +666,7 @@ Suppose there is a Java method that accepts an int array of indices:
 ``` java
 public class JavaArrayExample {
     public void removeIndices(int[] indices) {
-        // code here...
+        // Your code here
     }
 }
 ```
@@ -528,15 +676,15 @@ To pass an array of primitive values, you can do the following in Kotlin:
 ```kotlin
 val javaObj = JavaArrayExample()
 val array = intArrayOf(0, 1, 2, 3)
-javaObj.removeIndices(array)  // passes int[] to method
+javaObj.removeIndices(array) // Passes int[] to method
 ```
 
 When compiling to the JVM bytecode, the compiler optimizes access to arrays so that there's no overhead introduced:
 
 ```kotlin
 val array = arrayOf(1, 2, 3, 4)
-array[1] = array[1] * 2 // no actual calls to get() and set() generated
-for (x in array) { // no iterator created
+array[1] = array[1] * 2 // No actual calls to get() and set() generated
+for (x in array) {      // No iterator created
     print(x)
 }
 ```
@@ -544,7 +692,7 @@ for (x in array) { // no iterator created
 Even when you navigate with an index, it does not introduce any overhead:
 
 ```kotlin
-for (i in array.indices) { // no iterator created
+for (i in array.indices) { // No iterator created
     array[i] += 2
 }
 ```
@@ -552,7 +700,7 @@ for (i in array.indices) { // no iterator created
 Finally, `in`-checks have no overhead either:
 
 ```kotlin
-if (i in array.indices) { // same as (i >= 0 && i < array.size)
+if (i in array.indices) { // Same as (i >= 0 && i < array.size)
     print(array[i])
 }
 ```
@@ -565,12 +713,12 @@ Java classes sometimes use a method declaration for the indices with a variable 
 public class JavaArrayExample {
 
     public void removeIndicesVarArg(int... indices) {
-        // code here...
+        // Your code here
     }
 }
 ```
 
-In that case you need to use the spread operator `*` to pass the `IntArray`:
+In that case, you need to use the spread operator `*` to pass the `IntArray`:
 
 ```kotlin
 val javaObj = JavaArrayExample()
@@ -584,6 +732,31 @@ Since Java has no way of marking methods for which it makes sense to use the ope
 Java methods with the right name and signature as operator overloads and other conventions (`invoke()` etc.)
 Calling Java methods using the infix call syntax is not allowed.
 
+For example, you can use a Java class that declares `get(int)` and `set(int, T)` methods with the indexed access
+operator in Kotlin:
+
+```java
+public class IntContainer {
+    private final int[] values = new int[10];
+
+    public int get(int index) {
+        return values[index];
+    }
+
+    public void set(int index, int value) {
+        values[index] = value;
+    }
+}
+```
+
+```kotlin
+fun main() {
+    val container = IntContainer()
+    container[0] = 42     // Calls set(0, 42)
+    println(container[0]) // Calls get(0)
+}
+```
+
 ## Checked exceptions
 
 In Kotlin, all [exceptions are unchecked](exceptions.md), meaning that the compiler does not force you to catch any of them.
@@ -592,7 +765,7 @@ So, when you call a Java method that declares a checked exception, Kotlin does n
 ```kotlin
 fun render(list: List<*>, to: Appendable) {
     for (item in list) {
-        to.append(item.toString()) // Java would require us to catch IOException here
+        to.append(item.toString()) // In Java, you'd need to catch IOException thrown from Appendable.append()
     }
 }
 ```
@@ -603,30 +776,73 @@ When Java types are imported into Kotlin, all the references of the type `java.l
 Since `Any` is not platform-specific, it only declares `toString()`, `hashCode()` and `equals()` as its members,
 so to make other members of `java.lang.Object` available, Kotlin uses [extension functions](extensions.md).
 
-### wait()/notify()
+### `wait()` and `notify()`
 
 Methods `wait()` and `notify()` are not available on references of type `Any`. Their usage is generally discouraged in
-favor of `java.util.concurrent`. If you really need to call these methods, you can cast to `java.lang.Object`:
+favor of `java.util.concurrent`.
+
+If you have to call these methods, access them through Java objects and suppress the `PLATFORM_CLASS_MAPPED_TO_KOTLIN` warning:
 
 ```kotlin
-(foo as java.lang.Object).wait()
+import java.util.LinkedList
+
+class SimpleBlockingQueue<T>(private val capacity: Int) {
+    private val queue = LinkedList<T>()
+
+    // Uses a java.lang.Object instance to access wait() and notify()
+    // In Kotlin, the standard 'Any' type doesn't expose these methods
+    @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
+    private val lock = Object()
+
+    fun put(item: T) {
+        synchronized(lock) {
+            while (queue.size >= capacity) {
+                lock.wait()
+            }
+            queue.add(item)
+            println("Produced: $item")
+
+            lock.notifyAll()
+        }
+    }
+
+    fun take(): T {
+        synchronized(lock) {
+            while (queue.isEmpty()) {
+                lock.wait()
+            }
+            val item = queue.removeFirst()
+            println("Consumed: $item")
+
+            lock.notifyAll()
+            return item
+        }
+    }
+}
 ```
 
-### getClass()
-
-To retrieve the Java class of an object, use the `java` extension property on a [class reference](reflection.md#class-references):
+Or explicitly cast to `java.lang.Object` and suppress the `PLATFORM_CLASS_MAPPED_TO_KOTLIN` warning:
 
 ```kotlin
-val fooClass = foo::class.java
+@Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
+(instance as java.lang.Object).wait()
 ```
 
-The code above uses a [bound class reference](reflection.md#bound-class-references). You can also use the `javaClass` extension property:
+### `getClass()`
+
+To retrieve the Java class of an object, use the `java` extension property on a [class reference](reflection.md#obtain-a-runtime-class):
 
 ```kotlin
-val fooClass = foo.javaClass
+val instanceClass = instance::class.java
 ```
 
-### clone()
+The code above uses a [bound class reference](lambdas.md#bound-and-unbound-references). You can also use the `javaClass` extension property:
+
+```kotlin
+val instanceClass = instance.javaClass
+```
+
+### `clone()`
 
 To override `clone()`, your class needs to extend `kotlin.Cloneable`:
 
@@ -639,19 +855,24 @@ class Example : Cloneable {
 Don't forget about [Effective Java, 3rd Edition](https://www.oracle.com/technetwork/java/effectivejava-136174.html),
 Item 13: *Override clone judiciously*.
 
-### finalize()
+### `finalize()`
 
-To override `finalize()`, all you need to do is simply declare it, without using the `override` keyword:
+To override `finalize()`, declare it without using the `override` keyword:
 
 ```kotlin
 class C {
     protected fun finalize() {
-        // finalization logic
+        // Finalization logic
     }
 }
 ```
 
 According to Java's rules, `finalize()` must not be `private`.
+
+> The `finalize()` method is deprecated in modern Java versions. Consider alternatives such as [`java.lang.ref.Cleaner`](https://docs.oracle.com/javase/9/docs/api/java/lang/ref/Cleaner.html)
+> or [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html) instead.
+>
+{style="note"}
 
 ## Inheritance from Java classes
 
@@ -666,14 +887,37 @@ around as a value but can access the members explicitly, for example:
 if (Character.isLetter(a)) { ... }
 ```
 
-To access static members of a Java type that is [mapped](#mapped-types) to a Kotlin type, use the full qualified name of
-the Java type: `java.lang.Integer.bitCount(foo)`.
+To call a static method of an imported Java class, use the class name directly, just like in Java. Consider the
+following Java class:
+
+```java
+package org.example;
+
+public class MathUtils {
+    public static int triple(int value) {
+        return value * 3;
+    }
+}
+```
+
+Import the class and call its static method through the class name:
+
+```kotlin
+import org.example.MathUtils
+
+fun main() {
+    println(MathUtils.triple(5)) // Calls the static triple() method
+}
+```
+
+To access static members of a Java type that is [mapped](#mapped-types) to a Kotlin type, use the fully qualified name of
+the Java type: `java.lang.Integer.bitCount(5)`.
 
 ## Java reflection
 
 Java reflection works on Kotlin classes and vice versa. As mentioned above, you can use `instance::class.java`,
 `ClassName::class.java` or `instance.javaClass` to enter Java reflection through `java.lang.Class`.
-Do not use `ClassName.javaClass` for this purpose because it refers to `ClassName`'s companion object class,
+Don't use `ClassName.javaClass` for this purpose because it refers to `ClassName`'s [companion object](object-declarations.md#companion-objects) class,
 which is the same as `ClassName.Companion::class.java` and not `ClassName::class.java`.
 
 For each primitive type, there are two different Java classes, and Kotlin provides ways to get both. For
@@ -681,8 +925,8 @@ example, `Int::class.java` will return the class instance representing the primi
 corresponding to `Integer.TYPE` in Java. To get the class of the corresponding wrapper type, use
 `Int::class.javaObjectType`, which is equivalent of Java's `Integer.class`.
 
-Other supported cases include acquiring a Java getter/setter method or a backing field for a Kotlin property, a `KProperty` for a Java field, a Java method or constructor for a `KFunction` and vice versa.
-
+Other supported cases include acquiring a Java getter/setter method or a backing field for a Kotlin property,
+a `KProperty` for a Java field, a Java method or constructor for a `KFunction`, and vice versa.
 
 ## SAM conversions
 
@@ -697,10 +941,10 @@ You can use this for creating instances of SAM interfaces:
 val runnable = Runnable { println("This runs in a runnable") }
 ```
 
-...and in method calls:
+And in method calls:
 
 ```kotlin
-val executor = ThreadPoolExecutor()
+val executor = Executors.newSingleThreadExecutor()
 // Java signature: void execute(Runnable command)
 executor.execute { println("This runs in a thread pool") }
 ```
@@ -713,17 +957,16 @@ by the compiler when needed:
 executor.execute(Runnable { println("This runs in a thread pool") })
 ```
 
-> SAM conversions only work for interfaces, not for abstract classes, even if those also have just a single
-abstract method.
+> SAM conversions only work for interfaces. They don't apply to abstract classes, even if those classes have only one abstract method.
 >
-{type="note"}
+{style="note"}
 
 ## Using JNI with Kotlin
 
 To declare a function that is implemented in native (C or C++) code, you need to mark it with the `external` modifier:
 
 ```kotlin
-external fun foo(x: Int): Double
+external fun calculateSum(x: Int): Double
 ```
 
 The rest of the procedure works in exactly the same way as in Java.

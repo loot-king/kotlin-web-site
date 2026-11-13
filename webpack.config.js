@@ -9,40 +9,26 @@ module.exports = (params = {}) => {
   const isProduction = process.env.NODE_ENV === 'production';
   const isDevelopment = !isProduction;
   const env = isProduction ? 'production' : 'development';
-  const isDevServer = process.env.WEBPACK_SERVE === 'true';
   const sourcemaps = params.sourcemaps || isDevelopment;
 
-  const siteHost = 'localhost:8080';
-  const webDemoURL = params['webdemo-url'] || 'http://kotlin-web-demo-cloud.passive.aws.intellij.net';
   const indexName = params['index-name'] || process.env.INDEX_NAME || 'dev_KOTLINLANG';
 
   return {
     entry: {
-      //shared
-      'common': './static/js/page/common.js',
-      'index': './static/js/page/index/index.js',
-      'events': './static/js/page/events/index.js',
-      'videos': './static/js/page/videos.js',
-      'grammar': './static/js/page/grammar.js',
-      'community': './static/js/page/community/community.js',
-      'api': './static/js/page/api/api.js',
-      'reference': './static/js/page/reference.js',
-      'tutorial': './static/js/page/tutorial.js',
-      'styles': './static/css/styles.scss',
-      'styles-v2': './static/css/styles-v2.scss'
+      'dokka-template': './static/js/page/dokka-template/index.js',
     },
 
     output: {
       path: path.join(__dirname, '_assets'),
       publicPath: '/_assets/',
       filename: '[name].js',
-      clean: !isDevServer,
+      clean: true,
     },
 
     devtool: sourcemaps ? 'source-map' : false,
 
     mode: env,
-    bail: !isDevServer,
+    bail: true,
 
     resolve: {
       alias: {
@@ -88,15 +74,7 @@ module.exports = (params = {}) => {
           ]
         },
         {
-          test: /\.twig$/,
-          loader: 'nunjucks-loader'
-        },
-        {
-          test: /\.mustache$/,
-          loader: 'mustache-loader'
-        },
-        {
-          test: /\.svg/,
+          test: /\.svg(?:\?\w+)?$/,
           use: [
             {
               loader: 'url-loader',
@@ -157,31 +135,11 @@ module.exports = (params = {}) => {
 
       isProduction && new CssoWebpackPlugin(),
 
-      new webpack.ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery',
-        'window.jQuery': 'jquery',
-        'window.$': 'jquery',
-      }),
-
       new webpack.DefinePlugin({
-        webDemoURL: JSON.stringify(webDemoURL),
         indexName: JSON.stringify(indexName),
-        'process.env.NODE_ENV': JSON.stringify(env)
+        'process.env.NODE_ENV': JSON.stringify(env),
+        'process.env.ALGOLIA_INDEX_NAME': JSON.stringify(process.env.ALGOLIA_INDEX_NAME)
       })
-    ].filter(Boolean),
-
-    devServer: {
-      port: 9000,
-      hot: true,
-      proxy: {
-        '/**': {
-          target: `http://${siteHost}`,
-          bypass: function (req) {
-            req.headers.host = siteHost;
-          }
-        }
-      }
-    }
+    ].filter(Boolean)
   };
 };

@@ -35,9 +35,6 @@
 - from: /foundation/language-committee-guidelines.html
   to: /docs/language-committee-guidelines.html
 
-- from: /docs/kotlin-pdf.html
-  to: /docs/kotlin-pdf.html
-
 - from: /docs/tutorials/httpservlets.html
   to: /docs/server-overview.html
 
@@ -59,16 +56,18 @@
 - from: /docs/tutorials/native/kotlin-native-with-clion.html
   to: /docs/tutorials/native/using-command-line-compiler.html
 
-- from: /docs/tutorials/native/using-command-line-compiler.html
-  to: /docs/native-command-line-compiler.html
-
 - from: /docs/tutorials/native/gradle-for-kotlin-native.html
   to: /docs/tutorials/native/using-gradle.html
 
 - from: /docs/tutorials/native/interop-with-c.html
   to: /docs/native-app-with-c-and-libcurl.html
 
-- from: /docs/tutorials/native/using-intellij-idea.html
+- from:
+  - /docs/tutorials/native/using-intellij-idea.html
+  - /docs/tutorials/native/using-gradle.html
+  - /docs/native-gradle.html
+  - /docs/tutorials/native/using-command-line-compiler.html
+  - /docs/native-command-line-compiler.html
   to: /docs/native-get-started.html
 
 - from: /docs/tutorials/native/targeting-multiple-platforms.html
@@ -76,9 +75,6 @@
 
 - from: /docs/tutorials/native/mapping-strings-from-c.html
   to: /docs/mapping-strings-from-c.html
-
-- from: /docs/tutorials/native/mpp-ios-android.html
-  to: /docs/multiplatform-mobile-create-first-app.html
 
 - from: /docs/tutorials/native/apple-framework.html
   to: /docs/apple-framework.html
@@ -95,17 +91,12 @@
 - from: /docs/tutorials/native/intro-to-kotlin-native.html
   to: /docs/native-app-with-c-and-libcurl.html
 
-- from: /docs/tutorials/native/working-with-klib.html
-  to: /docs/multiplatform-library.html
-
 - from: /docs/tutorials/native/basic-kotlin-native-app.html
   to: /docs/tutorials/native/using-command-line-compiler.html
 
 - from: /docs/tutorials/native/mapping-primitive-data-types-from-c.html
   to: /docs/mapping-primitive-data-types-from-c.html
 
-- from: /docs/tutorials/native/using-gradle.html
-  to: /docs/native-gradle.html
 
 - from: /docs/tutorials/kotlin-and-ci.html
   to: /docs/kotlin-and-ci.html
@@ -142,12 +133,6 @@
 - from: /docs/tutorials/edu-tools-learner.html
   to: /docs/edu-tools-learner.html
 
-- from: /docs/tutorials/mpp/multiplatform-library.html
-  to: /docs/multiplatform-library.html
-
-- from: /docs/tutorials/mpp/intro-to-kotlin-mpp.html
-  to: https://play.kotlinlang.org/hands-on/Introduction%20to%20Kotlin%20Multiplatform/01_Introduction
-
 - from: /docs/tutorials/coroutines/coroutines-basic-jvm.html
   to: /docs/coroutines-basic-jvm.html
 
@@ -161,7 +146,7 @@
   to: /docs/debug-flow-with-idea.html
 
 - from: /docs/tutorials/coroutines/intro-to-coroutines-and-channels.html
-  to: https://play.kotlinlang.org/hands-on/Introduction%20to%20Coroutines%20and%20Channels
+  to: /docs/coroutines-and-channels.html
 
 - from: /docs/tutorials/getting-started-eclipse.html
   to: /docs/getting-started.html
@@ -170,7 +155,10 @@
   to: /docs/tutorials/javascript/setting-up.html
 
 - from: /docs/tutorials/javascript/react-and-kotlin-js.html
-  to: https://play.kotlinlang.org/hands-on/Building%20Web%20Applications%20with%20React%20and%20Kotlin%20JS/01_Introduction
+  to: /docs/js-react.html
+
+- from: /docs/js-hands-ons.html
+  to: /docs/js-overview.html#get-started-with-kotlin-js
 
 - from: /docs/tutorials/javascript/debugging-javascript/debugging-javascript.html
   to: /docs/tutorials/javascript/debugging-kotlin-in-browser.html
@@ -241,9 +229,6 @@
 - from: /docs/reference/set-operations.html
   to: /docs/set-operations.html
 
-- from: /docs/reference/mpp-supported-platforms.html
-  to: /docs/multiplatform-supported-platforms.html
-
 - from: /docs/reference/object-declarations.html
   to: /docs/object-declarations.html
 
@@ -268,17 +253,11 @@
 - from: /docs/reference/server-overview.html
   to: /docs/server-overview.html
 
-- from: /docs/reference/mpp-share-on-platforms.html
-  to: /docs/multiplatform-share-on-platforms.html
-
 - from: /docs/reference/extensions.html
   to: /docs/extensions.html
 
 - from: /docs/reference/whatsnew12.html
   to: /docs/whatsnew12.html
-
-- from: /docs/reference/mpp-set-up-targets.html
-  to: /docs/multiplatform-set-up-targets.html
 
 - from: /docs/reference/equality.html
   to: /docs/equality.html
@@ -298,20 +277,16 @@
 - from: /docs/reference/native/faq.html
   to: /docs/native-faq.html
 
-- from: /docs/reference/native/ios_symbolication.html
-  to: /docs/native-ios-symbolication.html
+- from:
+  - /docs/reference/native/ios_symbolication.html
+  - /docs/native-ios-symbolication.html
+  to: /docs/native-debugging.html
 
 - from: /docs/reference/native/immutability.html
   to: /docs/native-immutability.html
 
 - from: /docs/reference/native/objc_interop.html
   to: /docs/native-objc-interop.html
-
-- from: /docs/reference/native/gradle_plugin.html
-  to: /docs/multiplatform-dsl-reference.html
-
-- from: /docs/reference/native/cocoapods.html
-  to: /docs/native-cocoapods.html
 
 - from: /docs/reference/native/debugging.html
   to: /docs/native-debugging.html
@@ -343,9 +318,6 @@
 - from: /docs/reference/generics.html
   to: /docs/generics.html
 
-- from: /docs/reference/mpp-add-dependencies.html
-  to: /docs/multiplatform-add-dependencies.html
-
 - from: /docs/reference/compatibility-guide-14.html
   to: /docs/compatibility-guide-14.html
 
@@ -358,9 +330,6 @@
 - from: /docs/reference/whatsnew1430.html
   to: /docs/whatsnew1430.html
 
-- from: /docs/reference/mpp-intro.html
-  to: /docs/multiplatform-get-started.html
-
 - from: /docs/reference/multi-declarations.html
   to: /docs/multi-declarations.html
 
@@ -369,9 +338,6 @@
 
 - from: /docs/reference/whatsnew1420.html
   to: /docs/whatsnew1420.html
-
-- from: /docs/reference/multiplatform.html
-  to: /docs/multiplatform.html
 
 - from: /docs/reference/kotlin-doc.html
   to: /docs/kotlin-doc.html
@@ -391,8 +357,10 @@
 - from: /docs/reference/kapt.html
   to: /docs/kapt.html
 
-- from: /docs/reference/compiler-plugins.html
-  to: /docs/all-open-plugin.html
+- from:
+  - /docs/reference/compiler-plugins.html
+  - /docs/compiler-plugins.html
+  to: /docs/kotlin-spring-plugin.html
 
 - from: /docs/reference/annotations.html
   to: /docs/annotations.html
@@ -403,29 +371,22 @@
 - from: /docs/reference/idioms.html
   to: /docs/idioms.html
 
-- from: /docs/reference/mpp-build-native-binaries.html
-  to: /docs/multiplatform-build-native-binaries.html
-
 - from: /docs/reference/js-interop.html
   to: /docs/js-interop.html
 
 - from: /docs/reference/type-safe-builders.html
   to: /docs/type-safe-builders.html
 
-- from: /docs/reference/mpp-run-tests.html
-  to: /docs/multiplatform-run-tests.html
-
-- from: /docs/reference/javascript-dce.html
-  to: /docs/javascript-dce.html
+- from:
+  - /docs/reference/javascript-dce.html
+  - /docs/javascript-dce.html
+  to: /docs/js-ir-compiler.html
 
 - from: /docs/reference/inline-classes.html
   to: /docs/inline-classes.html
 
 - from: /docs/reference/kotlin-osgi.html
   to: /docs/kotlin-osgi.html
-
-- from: /docs/reference/migrating-multiplatform-project-to-14.html
-  to: /docs/migrating-multiplatform-project-to-14.html
 
 - from: /docs/reference/collection-plus-minus.html
   to: /docs/collection-plus-minus.html
@@ -441,12 +402,6 @@
 
 - from: /docs/reference/properties.html
   to: /docs/properties.html
-
-- from: /docs/reference/mpp-publish-lib.html
-  to: /docs/multiplatform-publish-lib.html
-
-- from: /docs/reference/building-mpp-with-gradle.html
-  to: /docs/multiplatform-get-started.html
 
 - from: /docs/reference/whatsnew-plugin-20203.html
   to: /docs/whatsnew-plugin-20203.html
@@ -510,9 +465,6 @@
 - from: /docs/reference/js-external-declarations-with-dukat.html
   to: /docs/js-external-declarations-with-dukat.html
 
-- from: /docs/reference/mpp-configure-compilations.html
-  to: /docs/multiplatform-configure-compilations.html
-
 - from: /docs/reference/basic-types.html
   to: /docs/basic-types.html
 
@@ -543,8 +495,10 @@
 - from: /docs/reference/coroutines/exception-handling.html
   to: /docs/exception-handling.html
 
-- from: /docs/reference/coroutines/cancellation-and-timeouts.html
-  to: /docs/cancellation-and-timeouts.html
+- from:
+   - /docs/reference/coroutines/cancellation-and-timeouts.html
+   - /docs/cancellation-and-timeouts.html
+  to: /docs/coroutines-cancellation.html
 
 - from: /docs/reference/coroutines/shared-mutable-state-and-concurrency.html
   to: /docs/shared-mutable-state-and-concurrency.html
@@ -562,19 +516,18 @@
   to: /docs/coroutine-context-and-dispatchers.html
 
 - from: /docs/reference/coroutines/flow.html
-  to: /docs/flow.html
+  to: /docs/coroutines-flow.html
 
-- from: /docs/reference/using-ant.html
-  to: /docs/ant.html
+- from:
+  - /docs/reference/using-ant.html
+  - /docs/ant.html
+  to: /docs/compatibility-guide-23.html
 
 - from: /docs/reference/whatsnew11.html
   to: /docs/whatsnew11.html
 
 - from: /docs/reference/visibility-modifiers.html
   to: /docs/visibility-modifiers.html
-
-- from: /docs/reference/mpp-discover-project.html
-  to: /docs/multiplatform-discover-project.html
 
 - from: /docs/reference/null-safety.html
   to: /docs/null-safety.html
@@ -606,14 +559,8 @@
 - from: /docs/reference/js-ir-compiler.html
   to: /docs/js-ir-compiler.html
 
-- from: /docs/reference/mpp-create-lib.html
-  to: /docs/multiplatform-create-lib.html
-
 - from: /docs/reference/collection-ordering.html
   to: /docs/collection-ordering.html
-
-- from: /docs/reference/platform-specific-declarations.html
-  to: /docs/multiplatform-connect-to-apis.html
 
 - from: /docs/reference/operator-overloading.html
   to: /docs/operator-overloading.html
@@ -621,14 +568,8 @@
 - from: /docs/reference/java-to-kotlin-interop.html
   to: /docs/java-to-kotlin-interop.html
 
-- from: /docs/reference/mpp-dsl-reference.html
-  to: /docs/multiplatform-dsl-reference.html
-
 - from: /docs/reference/scope-functions.html
   to: /docs/scope-functions.html
-
-- from: /docs/reference/mpp-connect-to-apis.html
-  to: /docs/multiplatform-connect-to-apis.html
 
 - from: /docs/reference/type-aliases.html
   to: /docs/type-aliases.html
@@ -665,7 +606,263 @@
     - /docs/kmm-use-ktor-for-networking.html
   to: https://ktor.io/docs/getting-started-ktor-client-multiplatform-mobile.html
 
+- from: /docs/kotlin-mascot.html
+  to: https://blog.jetbrains.com/kotlin/2021/10/introducing-the-kotlin-mascot/
+
+- from: /user-groups/branding.html
+  to: /docs/kug-guidelines.html
+
+- from: /user-groups/support.html
+  to: /docs/kug-guidelines.html#support-for-kugs-from-jetbrains
+
 - from:
-    - /docs/kmm-configure-sqldelight-for-data-storage.html
-    - /docs/multiplatform-mobile-configure-sqldelight-for-data-storage.html
-  to: https://play.kotlinlang.org/hands-on/Networking%20and%20Data%20Storage%20with%20Kotlin%20Multiplatfrom%20Mobile/
+    - /docs/wasm-libraries.html
+  to: /docs/wasm-overview.html
+
+- from:
+    - /docs/native-immutability.html
+    - /docs/native-concurrency.html
+    - /docs/multiplatform-mobile-concurrency-overview.html
+    - /docs/kmm-concurrency-overview.html
+    - /docs/multiplatform-mobile-concurrent-mutability.html
+    - /docs/kmm-concurrent-mutability.html
+    - /docs/multiplatform-mobile-concurrency-and-coroutines.html
+    - /docs/kmm-concurrency-and-coroutines.html
+  to: /docs/native-memory-manager.html
+
+- from:
+    - /docs/platform-specific-declarations.html
+    - /docs/mpp-connect-to-apis.html
+    - /docs/kmm-connect-to-platform-specific-apis.html
+    - /docs/multiplatform-mobile-connect-to-platform-specific-apis.html
+    - /docs/multiplatform-connect-to-apis.html
+    - /docs/reference/platform-specific-declarations.html
+    - /docs/reference/mpp-connect-to-apis.html
+  to: /docs/multiplatform/multiplatform-connect-to-apis.html
+
+- from:
+    - /docs/multiplatform-mobile-getting-started.html
+    - /docs/kmm-getting-started.html
+  to: /docs/multiplatform/multiplatform-create-first-app.html
+
+- from:
+    - /docs/multiplatform-mobile-setup.html
+    - /docs/kmm-setup.html
+  to: /docs/multiplatform/quickstart.html
+
+- from:
+    - /docs/multiplatform-mobile-create-first-app.html
+    - /docs/kmm-create-first-app.html
+    - /docs/tutorials/native/mpp-ios-android.html
+  to: /docs/multiplatform/multiplatform-create-first-app.html
+
+- from: /docs/multiplatform-mobile-update-ui.html
+  to: /docs/multiplatform/multiplatform-update-ui.html
+
+- from: /docs/multiplatform-mobile-dependencies.html
+  to: /docs/multiplatform/multiplatform-dependencies.html
+
+- from: /docs/multiplatform-mobile-upgrade-app.html
+  to: /docs/multiplatform/multiplatform-upgrade-app.html
+
+- from: /docs/multiplatform-mobile-wrap-up.html
+  to: /docs/multiplatform/multiplatform-wrap-up.html
+
+- from:
+  - /docs/multiplatform-mobile-integrate-in-existing-app.html
+  - /docs/kmm-integrate-in-existing-app.html
+  to: /docs/multiplatform/multiplatform-integrate-in-existing-app.html
+
+- from:
+  - /docs/multiplatform-mobile-publish-apps.html
+  - /docs/kmm-publish-apps.html
+  to: /docs/multiplatform/multiplatform-publish-apps.html
+
+- from:
+  - /docs/multiplatform-mobile-ktor-sqldelight.html
+  - /docs/kmm-configure-sqldelight-for-data-storage.html
+  - /docs/multiplatform-mobile-configure-sqldelight-for-data-storage.html
+  to: /docs/multiplatform/multiplatform-ktor-sqldelight.html
+
+- from:
+    - /docs/tutorials/native/working-with-klib.html
+    - /docs/working-with-klib.html
+    - /docs/mpp-publish-lib.html
+    - /docs/reference/mpp-publish-lib.html
+    - /docs/multiplatform-publish-lib.html
+  to: /docs/multiplatform/multiplatform-publish-lib-setup.html
+
+- from:
+    - /docs/tutorials/mpp/multiplatform-library.html
+    - /docs/multiplatform-full-stack-app.html
+    - /docs/multiplatform-library.html
+    - /docs/multiplatform-create-lib.html
+    - /docs/mpp-create-lib.html
+    - /docs/reference/mpp-create-lib.html
+  to: /docs/multiplatform/create-kotlin-multiplatform-library.html
+
+- from:
+  - /docs/reference/mpp-run-tests.html
+  - /docs/multiplatform-run-tests.html
+  - /docs/mpp-run-tests.html
+  to: /docs/multiplatform/multiplatform-run-tests.html
+
+- from:
+    - /docs/multiplatform-mobile-samples.html
+    - /docs/kmm-samples.html
+  to: /docs/multiplatform/multiplatform-samples.html
+
+- from:
+    - /docs/multiplatform-mobile-faq.html
+    - /docs/kmm-faq.html
+  to: /docs/multiplatform/faq.html
+
+- from:
+    - /docs/multiplatform-mobile-understand-project-structure.html
+    - /docs/kmm-understand-project-structure.html
+    - /docs/mpp-discover-project.html
+    - /docs/reference/mpp-discover-project.html
+    - /docs/reference/mpp-set-up-targets.html
+    - /docs/mpp-set-up-targets.html
+    - /docs/multiplatform-set-up-targets.html
+    - /docs/multiplatform-discover-project.html
+  to: /docs/multiplatform/multiplatform-discover-project.html
+
+- from:
+    - /docs/multiplatform-mobile-android-dependencies.html
+    - /docs/kmm-add-dependencies.html
+    - /docs/multiplatform-mobile-add-dependencies.html
+    - /docs/multiplatform-android-dependencies.html
+  to: /docs/multiplatform/multiplatform-android-dependencies.html
+
+- from:
+    - /docs/multiplatform-ios-android-dependencies.html
+    - /docs/multiplatform-ios-dependencies.html
+  to: /docs/multiplatform/multiplatform-ios-dependencies.html
+
+- from:
+    - /docs/multiplatform-mobile-introduce-your-team.html
+    - /docs/kmm-introduce-your-team.html
+    - /docs/multiplatform-introduce-your-team.html
+    - /docs/mobile/introduce-your-team-to-kmm.html
+  to: /docs/multiplatform/multiplatform-introduce-your-team.html
+
+- from:
+    - /docs/multiplatform-mobile-plugin-releases.html
+    - /docs/kmm-plugin-releases.html
+    - /docs/multiplatform-plugin-releases.html
+  to: /docs/multiplatform/multiplatform-plugin-releases.html
+
+- from: /docs/cross-platform-mobile-development.html
+  to: /docs/multiplatform/cross-platform-mobile-development.html
+
+- from: /docs/native-and-cross-platform.html
+  to: /docs/multiplatform/native-and-cross-platform.html
+
+- from: /docs/cross-platform-frameworks.html
+  to: /docs/multiplatform/cross-platform-frameworks.html
+
+- from:
+    - /docs/tutorials/mpp/intro-to-kotlin-mpp.html
+    - /docs/reference/multiplatform.html
+    - /docs/reference/mpp-intro.html
+    - /docs/mpp-intro.html
+    - /docs/multiplatform-intro.html
+    - /docs/multiplatform.html
+    - /docs/mpp-get-started.html
+    - /docs/multiplatform-tutorials.html
+    - /docs/multiplatform-get-started.html
+  to: /docs/multiplatform/get-started.html
+
+- from:
+    - /docs/reference/mpp-supported-platforms.html
+    - /docs/reference/mpp-dsl-reference.html
+    - /docs/mpp-dsl-reference.html
+    - /docs/mpp-supported-platforms.html
+    - /docs/multiplatform-supported-platforms.html
+    - /docs/reference/native/gradle_plugin.html
+    - /docs/reference/building-mpp-with-gradle.html
+    - /docs/multiplatform-dsl-reference.html
+  to: /docs/multiplatform/multiplatform-dsl-reference.html
+
+- from:
+    - /docs/reference/mpp-share-on-platforms.html
+    - /docs/mpp-share-on-platforms.html
+    - /docs/multiplatform-share-on-platforms.html
+  to:  /docs/multiplatform/multiplatform-share-on-platforms.html
+
+- from:
+    - /docs/reference/mpp-add-dependencies.html
+    - /docs/mpp-add-dependencies.html
+    - /docs/multiplatform-add-dependencies.html
+  to: /docs/multiplatform/multiplatform-add-dependencies.html
+
+- from:
+    - /docs/reference/mpp-configure-compilations.html
+    - /docs/mpp-configure-compilations.html
+    - /docs/multiplatform-configure-compilations.html
+  to: /docs/multiplatform/multiplatform-configure-compilations.html
+
+- from:
+    - /docs/mpp-build-native-binaries.html
+    - /docs/reference/mpp-build-native-binaries.html
+    - /docs/multiplatform-build-native-binaries.html
+  to: /docs/multiplatform/multiplatform-build-native-binaries.html
+
+- from:
+  - /docs/reference/native/cocoapods.html
+  - /docs/native-cocoapods.html
+  to: /docs/multiplatform/multiplatform-cocoapods-overview.html
+
+- from: /docs/native-cocoapods-dsl-reference.html
+  to: /docs/multiplatform/multiplatform-cocoapods-dsl-reference.html
+
+- from: /docs/native-cocoapods-libraries.html
+  to: /docs/multiplatform/multiplatform-cocoapods-libraries.html
+
+- from: /docs/native-cocoapods-xcode.html
+  to: /docs/multiplatform/multiplatform-cocoapods-xcode.html
+
+- from: /docs/native-spm.html
+  to: /docs/multiplatform/multiplatform-spm-export.html
+
+- from: /docs/multiplatform-direct-integration.html
+  to: /docs/multiplatform/multiplatform-direct-integration.html
+
+- from: /docs/multiplatform-advanced-project-structure.html
+  to: /docs/multiplatform/multiplatform-advanced-project-structure.html
+
+- from: /docs/multiplatform-ios-integration-overview.html
+  to: /docs/multiplatform/multiplatform-ios-integration-overview.html
+
+- from: /docs/multiplatform-android-layout.html
+  to: /docs/multiplatform/multiplatform-android-layout.html
+
+- from: /docs/multiplatform-expect-actual.html
+  to: /docs/multiplatform/multiplatform-expect-actual.html
+
+- from: /docs/multiplatform-compatibility-guide.html
+  to: /docs/multiplatform/multiplatform-compatibility-guide.html
+
+- from: /docs/multiplatform-spm-local-integration.html
+  to: /docs/multiplatform/multiplatform-spm-local-integration.html
+
+- from:
+    - /docs/migrating-multiplatform-project-to-14.html
+    - /docs/reference/migrating-multiplatform-project-to-14.html
+    - /docs/multiplatform-hierarchy.html
+  to: /docs/multiplatform/multiplatform-hierarchy.html
+
+- from: /docs/apple-privacy-manifest.html
+  to: /docs/multiplatform/multiplatform-privacy-manifest.html
+
+- from: /docs/dokka-markdown.html
+  to: https://github.com/Kotlin/dokka/blob/master/dokka-subprojects/plugin-gfm/README.md#gfm-plugin
+
+- from: /docs/multiplatform/choosing-web-target.html
+  to: /docs/web-overview.html
+
+- from:
+    - /docs/set-operations.html
+    - docs/collection-plus-minus.html
+  to: /docs/collection-combine.html

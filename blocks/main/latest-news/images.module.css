@@ -1,0 +1,36 @@
+@import "@jetbrains/kotlin-web-site-ui/out/components/breakpoints-v2/media.pcss";
+
+.image {
+    background: #000;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    width: 280px;
+    height: 156px;
+
+    @media (--ktl-ds) {
+        width: 312px;
+        height: 175px;
+    }
+    @media (--ktl-tl) {
+        width: 248px;
+        height: 139px;
+    }
+    @media (--ktl-ts) {
+        width: 280px;
+        height: 156px;
+    }
+    @media (--ktl-ml) {
+        width: 424px;
+        height: 238px;
+    }
+    @media (--ktl-ms) {
+        width: 312px;
+        height: 175px;
+    }
+}
+
+.imageSrc {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

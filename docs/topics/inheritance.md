@@ -1,5 +1,10 @@
 [//]: # (title: Inheritance)
 
+> Before creating an inheritance hierarchy with classes, consider using [abstract classes](classes.md#abstract-classes) or [interfaces](interfaces.md). 
+> You can inherit from abstract classes and interfaces by default. They are designed so that other classes can inherit their members and implement them.
+>
+{style="tip"}
+
 All classes in Kotlin have a common superclass, `Any`, which is the default superclass for a class with no supertypes declared:
 
 ```kotlin
@@ -8,12 +13,14 @@ class Example // Implicitly inherits from Any
 
 `Any` has three methods: `equals()`, `hashCode()`, and `toString()`. Thus, these methods are defined for all Kotlin classes.
 
-By default, Kotlin classes are final – they can’t be inherited. To make a class inheritable, mark it with the `open` keyword:
+By default, Kotlin classes are final – they can't be inherited. To make a class inheritable, mark it with the `open` keyword:
 
 ```kotlin
 open class Base // Class is open for inheritance
 
 ```
+
+[For more information, see Open keyword](#open-keyword).
 
 To declare an explicit supertype, place the type after a colon in the class header:
 
@@ -27,7 +34,7 @@ If the derived class has a primary constructor, the base class can (and must) be
 according to its parameters.
 
 If the derived class has no primary constructor, then each secondary constructor has to initialize the base type using
-the `super` keyword or it has to delegate to another constructor which does. Note that in this case different secondary
+the `super` keyword or it has to delegate to another constructor which does. Note that in this case, different secondary
 constructors can call different constructors of the base type:
 
 ```kotlin
@@ -35,6 +42,57 @@ class MyView : View {
     constructor(ctx: Context) : super(ctx)
 
     constructor(ctx: Context, attrs: AttributeSet) : super(ctx, attrs)
+}
+```
+
+## Open keyword
+
+In Kotlin, the `open` keyword indicates that a class or a member (function or property) can be overridden in subclasses.
+By default, Kotlin classes and their members are _final_, meaning they cannot be inherited from (for classes) or overridden 
+(for members) unless you explicitly mark them as `open`:
+
+```kotlin
+// Base class with the open keyword to allow inheritance
+open class Person(
+    val name: String
+) {
+    // Open function that can be overridden in a subclass
+    open fun introduce() {
+        println("Hello, my name is $name.")
+    }
+}
+
+// Subclass inheriting from Person and overriding the introduce() function
+class Student(
+    name: String,
+    val school: String
+) : Person(name) {
+    override fun introduce() {
+        println("Hi, I'm $name, and I study at $school.")
+    }
+}
+```
+
+If you override a member of a base class, the overriding member
+is also open by default. If you want to change this and forbid the subclasses of your
+class from overriding your implementation, you can explicitly mark the overriding
+member as `final`:
+
+```kotlin
+// Base class with the open keyword to allow inheritance
+open class Person(val name: String) {
+    // Open function that can be overridden in a subclass
+    open fun introduce() {
+        println("Hello, my name is $name.")
+    }
+}
+
+//  A subclass that inherits from Person and overrides the introduce() function
+class Student(name: String, val school: String) : Person(name) {
+    // The final keyword prevents further overrides in subclasses
+    final override fun introduce() {
+        println("Hi, I'm $name, and I study at $school.")
+    }
 }
 ```
 
@@ -53,7 +111,7 @@ class Circle() : Shape() {
 }
 ```
 
-The `override` modifier is required for `Circle.draw()`. If it were missing, the compiler would complain. If there is no
+The `override` modifier is required for `Circle.draw()`. If it's missing, the compiler will complain. If there is no
 `open` modifier on a function, like `Shape.fill()`, declaring a method with the same signature in a subclass is not allowed,
 either with `override` or without it. The `open` modifier has no effect when added to members of a final class – a class
 without an `open` modifier.

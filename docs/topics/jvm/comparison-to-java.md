@@ -6,43 +6,67 @@ Kotlin fixes a series of issues that Java suffers from:
 
 * Null references are [controlled by the type system](null-safety.md).
 * [No raw types](java-interop.md#java-generics-in-kotlin)
-* Arrays in Kotlin are [invariant](basic-types.md#arrays)
+* Arrays in Kotlin are [invariant](arrays.md)
 * Kotlin has proper [function types](lambdas.md#function-types), as opposed to Java's SAM-conversions
-* [Use-site variance](generics.md#use-site-variance-type-projections)  without wildcards
+* [Use-site variance](generics.md#use-site-variance-type-projections) without wildcards
 * Kotlin does not have checked [exceptions](exceptions.md)
+* [Separate interfaces for read-only and mutable collections](collections-overview.md)
+* Kotlin provides [a performant and ergonomic replacement for `Enum.values()`](enum-classes.md#find-enum-constants)
 
 ## What Java has that Kotlin does not
 
 * [Checked exceptions](exceptions.md)
-* [Primitive types](basic-types.md) that are not classes. The byte-code uses primitives where possible, but they are not
+* [Primitive types](types-overview.md) that are not classes. The byte-code uses primitives where possible, but they are not
     explicitly available.
 * [Static members](classes.md) are replaced with [companion objects](object-declarations.md#companion-objects),
     [top-level functions](functions.md), [extension functions](extensions.md#extension-functions), or [@JvmStatic](java-to-kotlin-interop.md#static-methods).
 * [Wildcard-types](generics.md) are replaced with [declaration-site variance](generics.md#declaration-site-variance) and
     [type projections](generics.md#type-projections).
 * [Ternary-operator `a ? b : c`](control-flow.md#if-expression) is replaced with [if expression](control-flow.md#if-expression). 
+* [Records](https://openjdk.org/jeps/395)
+* package-private [visibility modifier](visibility-modifiers.md)
 
+> Kotlin doesn't have pattern matching, but [smart casts in Kotlin](typecasts.md#smart-casts) provide similar functionality to 
+> [pattern Matching in Java](https://openjdk.org/projects/amber/design-notes/patterns/pattern-matching-for-java).
+>
+> Learn more in this [video on the official Kotlin by JetBrains channel](https://www.youtube.com/watch?v=yJDoa42X-wQ).
+>
+{style="note"}
 
 ## What Kotlin has that Java does not
 
 * [Lambda expressions](lambdas.md) + [Inline functions](inline-functions.md) = performant custom control structures
 * [Extension functions](extensions.md)
 * [Null-safety](null-safety.md)
-* [Smart casts](typecasts.md)
-* [String templates](basic-types.md#strings)
+* [String templates](strings.md)
 * [Properties](properties.md)
 * [Primary constructors](classes.md)
 * [First-class delegation](delegation.md)
-* [Type inference for variable and property types](basic-types.md)
+* [Type inference for variable and property types](types-overview.md) (**Java 10**: [Local-Variable Type Inference](https://openjdk.org/jeps/286))
 * [Singletons](object-declarations.md)
 * [Declaration-site variance & Type projections](generics.md)
 * [Range expressions](ranges.md)
 * [Operator overloading](operator-overloading.md)
 * [Companion objects](classes.md#companion-objects)
 * [Data classes](data-classes.md)
-* [Separate interfaces for read-only and mutable collections](collections-overview.md)
 * [Coroutines](coroutines-overview.md)
+* [Top-level functions](functions.md)
+* [Parameters with default values](functions.md#parameters-with-default-values)
+* [Named parameters](functions.md#named-arguments)
+* [Infix functions](functions.md#infix-notation)
+* [Expect and actual declarations](https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html)
+* [Explicit API mode](whatsnew14.md#explicit-api-mode-for-library-authors) and [better control of API surface](opt-in-requirements.md)
 
-## What’s next?
+> Java doesn't have smart casts, but [pattern matching](https://openjdk.org/projects/amber/design-notes/patterns/pattern-matching-for-java)
+> provides similar functionality to [smart casts in Kotlin](typecasts.md#smart-casts).
+>
+> Learn more in this [video on the official Kotlin by JetBrains channel](https://www.youtube.com/watch?v=yJDoa42X-wQ).
+>
+{style="note"}
 
-Learn how to perform [typical tasks with strings in Java and Kotlin](java-to-kotlin-idioms-strings.md).
+## What's next?
+
+Learn how to:
+* Perform [typical tasks with strings in Java and Kotlin](java-to-kotlin-idioms-strings.md).
+* Perform [typical tasks with collections in Java and Kotlin](java-to-kotlin-collections-guide.md).
+* [Handle nullability in Java and Kotlin](java-to-kotlin-nullability-guide.md).

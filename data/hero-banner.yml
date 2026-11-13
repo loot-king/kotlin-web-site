@@ -1,0 +1,10 @@
+### Hero Banner
+#
+# All banners that have `variant` are hidden by default. This is needed for A/B testing through Optimizely.  
+# If you don't use variations, use a list with one element without this attribute:
+#
+# ---
+#- title: "<title>"
+#  caption: "<caption>" 
+#  buttonLabel: "<button text>"
+#  buttonUrl: "<url>"

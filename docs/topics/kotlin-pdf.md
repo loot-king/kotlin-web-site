@@ -2,6 +2,6 @@
 
 Here you can download a PDF version of Kotlin documentation that includes everything except tutorials and API reference.
 
-**[Download Kotlin 1.6.20 documentation (PDF)](https://kotlinlang.org/docs/kotlin-reference.pdf)**
+<a href="https://kotlinlang.org/assets/kotlin-reference.pdf" as="button" mode="classic" icon="download" icon-position="right">Download Kotlin %kotlinVersion% PDF documentation</a>
 
-**[View the latest Kotlin documentation (online)](home.xml)**
+**[View the latest Kotlin documentation online](home.topic)**

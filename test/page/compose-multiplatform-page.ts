@@ -1,0 +1,103 @@
+import { Locator, Page } from '@playwright/test';
+import { GlobalSearch } from '../component/global-search';
+import { PageWithGlobalSearch } from './page-with-global-search';
+
+export class ComposeMultiplatformPage implements PageWithGlobalSearch {
+    readonly page: Page;
+    readonly globalSearch: GlobalSearch;
+    readonly main: Locator;
+
+    readonly hero: Locator;
+    readonly heroTitle: Locator;
+    readonly heroSubTitle: Locator;
+    readonly heroActionButton: Locator;
+    readonly heroCarousel: Locator;
+
+    readonly platformsBlock: Locator;
+    readonly platformsTitle: Locator;
+    readonly platformsItems: Locator;
+
+    readonly platformBenefitsBlock: Locator;
+    readonly platformBenefitsItems: Locator;
+    readonly platformBenefitsTitles: Locator;
+    readonly platformBenefitsVideo: Locator;
+    readonly platformBenefitsPlayButton: Locator;
+
+    readonly playgroundBlock: Locator;
+    readonly playgroundTitle: Locator;
+    readonly playgroundEditor: Locator;
+    readonly playgroundCode: Locator;
+    readonly playgroundOutput: Locator;
+    readonly playgroundOpenButton: Locator;
+    readonly playgroundRunButton: Locator;
+    readonly playgroundEditButton: Locator;
+
+    readonly quoteSection: Locator;
+    readonly quoteCards: Locator;
+    readonly quoteCounter: Locator;
+    readonly quotePrevButton: Locator;
+    readonly quoteNextButton: Locator;
+
+    readonly faqBlock: Locator;
+    readonly faqTitle: Locator;
+    readonly faqButtons: Locator;
+    readonly faqAnswers: Locator;
+
+    readonly ctaBlock: Locator;
+    readonly ctaBlockTitle: Locator;
+    readonly ctaBlockButton: Locator;
+
+    constructor(page: Page) {
+        this.page = page;
+        this.globalSearch = new GlobalSearch(this.page);
+
+        this.main = page.getByTestId('compose-multiplatform-landing');
+
+        this.hero = page.getByTestId('hero-block');
+        this.heroTitle = page.getByTestId('hero-title');
+        this.heroSubTitle = page.getByTestId('hero-subtitle');
+        this.heroActionButton = page.getByTestId('hero-get-started-button');
+        this.heroCarousel = page.getByTestId('hero-carousel');
+
+        this.platformsBlock = page.getByTestId('platforms-block');
+        this.platformsTitle = page.getByTestId('platforms-block-title');
+        this.platformsItems = page.getByTestId('platforms-block-item');
+
+        this.platformBenefitsBlock = page.getByTestId('platform-benefits-block');
+        this.platformBenefitsItems = page.getByTestId('platform-benefits-item');
+        this.platformBenefitsTitles = page.getByTestId('platform-benefits-title');
+        this.platformBenefitsVideo = page.getByTestId('platform-benefits-video');
+        this.platformBenefitsPlayButton = page.getByTestId('platform-benefits-play-button');
+
+        this.playgroundBlock = page.getByTestId('playground-block');
+        this.playgroundTitle = page.getByTestId('playground-block-title');
+        this.playgroundEditor = page.getByTestId('playground-block-editor');
+        // Rendered by the playground library, which provides no test ids
+        this.playgroundCode = this.playgroundEditor.locator('.CodeMirror-code');
+        this.playgroundOutput = this.playgroundEditor.locator('iframe');
+        this.playgroundOpenButton = this.playgroundBlock.getByRole('button', { name: 'Open in Playground' });
+        this.playgroundRunButton = this.playgroundBlock.getByRole('button', { name: 'Run' });
+        this.playgroundEditButton = this.playgroundBlock.getByRole('button', { name: 'Edit code example' });
+
+        this.quoteSection = page.getByTestId('quote-section');
+        this.quoteCards = page.getByTestId('quote-card');
+        this.quoteCounter = this.quoteSection.getByTestId('snap-carousel-counter');
+        this.quotePrevButton = this.quoteSection.getByRole('button', { name: 'Previous slide' });
+        this.quoteNextButton = this.quoteSection.getByRole('button', { name: 'Next slide' });
+
+        this.faqBlock = page.getByTestId('faq-block');
+        this.faqTitle = this.faqBlock.getByTestId('columned-faq-title');
+        this.faqButtons = this.faqBlock.locator('[data-rs-internal=collapse__button]');
+        this.faqAnswers = this.faqBlock.locator('[data-rs-internal=collapse__content]');
+
+        this.ctaBlock = page.getByTestId('cta-block');
+        this.ctaBlockTitle = page.getByTestId('cta-block-title');
+        this.ctaBlockButton = page.getByTestId('cta-block-button');
+    }
+
+    async init() {
+        await this.page.goto('/compose-multiplatform/');
+
+        await Promise.all([this.main.waitFor(), this.page.locator('html.hydrated').waitFor()]);
+    }
+}

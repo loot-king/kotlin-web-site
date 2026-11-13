@@ -11,7 +11,7 @@ The corresponding part in the Gradle build file looks as follows:
 ```kotlin
 dependencies {
     // ...
-    implementation(npm("is-sorted", "1.0.5"))
+    implementation(npm("is-sorted", "^1.0.5"))
 }
 ```
 
@@ -48,7 +48,7 @@ true
 false
 ```
 
-Because the JavaScript ecosystem has multiple ways of exposing functions in a package (for example through named or default
+Because the JavaScript ecosystem has multiple ways of exposing functions in a package (for example, through named or default
 exports), other npm packages might need a slightly altered structure for their external declarations.
 
 To learn more about how to write declarations, please refer to [Calling JavaScript from Kotlin](js-interop.md).

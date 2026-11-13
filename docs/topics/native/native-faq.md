@@ -2,20 +2,20 @@
 
 ## How do I run my program?
 
-Define a top-level function `fun main(args: Array<String>)` or just  `fun main()` if you are not interested
+Define a top-level function `fun main(args: Array<String>)` or just `fun main()` if you are not interested
 in passed arguments, please ensure it's not in a package.
-Also compiler switch `-entry` could be used to make any function taking `Array<String>` or no arguments
+Also, compiler switch `-entry` could be used to make any function taking `Array<String>` or no arguments
 and return `Unit` as an entry point.
 
 ## What is Kotlin/Native memory management model?
 
-Kotlin/Native provides an automated memory management scheme, similar to what Java or Swift provides.
-The current implementation includes an automated reference counter with a cycle collector to collect cyclical
-garbage.
+Kotlin/Native uses an automated memory management scheme that is similar to what Java or Swift provide.
+
+[Learn about the Kotlin/Native memory manager](native-memory-manager.md)
 
 ## How do I create a shared library?
 
-Use the `-produce dynamic` compiler switch, or `binaries.sharedLib()` in Gradle.
+Use the `-produce dynamic` compiler option or `binaries.sharedLib()` in your Gradle build file:
 
 ```kotlin
 kotlin {
@@ -25,14 +25,14 @@ kotlin {
 }
 ```
 
-It will produce a platform-specific shared object (`.so` on Linux, `.dylib` on macOS, and `.dll` on Windows targets) and a
+It produces a platform-specific shared object (`.so` on Linux, `.dylib` on macOS, and `.dll` on Windows targets) and a
 C language header, allowing the use of all public APIs available in your Kotlin/Native program from C/C++ code.
-See [this example](https://github.com/JetBrains/kotlin/tree/master/kotlin-native/samples/python_extension) of using such a
-shared object to provide a bridge between Python and Kotlin/Native.
+
+[Complete the Kotlin/Native as a dynamic library tutorial](native-dynamic-libraries.md)
 
 ## How do I create a static library or an object file?
 
-Use the `-produce static` compiler switch, or `binaries.staticLib()` in Gradle.
+Use the `-produce static` compiler option or `binaries.staticLib()` in your Gradle build file:
 
 ```kotlin
 kotlin {
@@ -42,12 +42,12 @@ kotlin {
 }
 ```
 
-It will produce a platform-specific static object (`.a` library format) and a C language header, allowing you to
+It produces a platform-specific static object (`.a` library format) and a C language header, allowing you to
 use all the public APIs available in your Kotlin/Native program from C/C++ code.
 
 ## How do I run Kotlin/Native behind a corporate proxy?
 
-As Kotlin/Native needs to download a platform specific toolchain, you need to specify
+As Kotlin/Native needs to download a platform-specific toolchain, you need to specify
 `-Dhttp.proxyHost=xxx -Dhttp.proxyPort=xxx` as the compiler's or `gradlew` arguments,
 or set it via the `JAVA_OPTS` environment variable.
 
@@ -86,7 +86,7 @@ kotlin {
 
 ## How do I rename the iOS framework?
 
-The default name is for an iOS framework  is `<project name>.framework`.
+The default name for an iOS framework is `<project name>.framework`.
 To set a custom name, use the `baseName` option. This will also set the module name.
 
 ```kotlin
@@ -103,47 +103,45 @@ kotlin {
 
 ## How do I enable bitcode for my Kotlin framework?
 
-By default gradle plugin adds it on iOS target.
- * For debug build it embeds placeholder LLVM IR data as a marker.
- * For release build it embeds bitcode as data.
+Bitcode embedding was deprecated in Xcode 14 and removed in Xcode 15 for all Apple targets.
+The Kotlin/Native compiler does not support bitcode embedding since Kotlin 2.0.20.
 
-Or commandline arguments: `-Xembed-bitcode` (for release) and `-Xembed-bitcode-marker` (debug)
+If you're using earlier versions of Xcode but want to upgrade to Kotlin 2.0.20 or later versions, disable bitcode
+embedding in your Xcode projects.
 
-Setting this in a Gradle DSL: 
+## How do I get better crash reports for iOS?
 
-```kotlin
-kotlin {
-    iosArm64("myapp") {
-        binaries {
-            framework {
-                // Use "marker" to embed the bitcode marker (for debug builds).
-                // Use "disable" to disable embedding.
-                embedBitcode("bitcode") // for release binaries.
-            }
-        }
-    }
-}
-```
+When an unhandled Kotlin exception reaches iOS code, crash reporting tools may show a vague report stating an internal
+Kotlin/Native issue instead of the actual line of code where the exception was thrown. This happens because the original
+Kotlin stack trace is lost by the time the crash is recorded.
 
-These options have nearly the same effect as clang's `-fembed-bitcode`/`-fembed-bitcode-marker`
-and swiftc's `-embed-bitcode`/`-embed-bitcode-marker`.
+You can work around this problem with third-party solutions like [NSExceptionKt](https://github.com/rickclephas/NSExceptionKt),
+which converts uncaught Kotlin exceptions into `NSException` instances so that your crash reporting tool captures the
+correct stack trace. It provides dedicated integrations for popular crash reporting tools:
 
-## Why do I see `InvalidMutabilityException`?
+* [Bugsnag](https://github.com/rickclephas/NSExceptionKt/blob/master/NSExceptionKtBugsnag/README.md)
+* [Firebase Crashlytics](https://github.com/rickclephas/NSExceptionKt/blob/master/NSExceptionKtCrashlytics/README.md)
 
-It likely happens, because you are trying to mutate a frozen object. An object can transfer to the
-frozen state either explicitly, as objects reachable from objects on which the `kotlin.native.concurrent.freeze` is called,
-or implicitly (i.e. reachable from `enum` or global singleton object - see the next question).
+## How do I reference objects safely from different coroutines?
 
-## How do I make a singleton object mutable?
+To safely access or update an object across multiple coroutines in Kotlin/Native, consider using concurrency-safe
+constructs, such as `@Volatile` and `AtomicReference`.
 
-Currently, singleton objects are immutable (i.e. frozen after creation), and it's generally considered
-good practise to have the global state immutable. If for some reason you need a mutable state inside such an
-object, use the `@konan.ThreadLocal` annotation on the object. Also the `kotlin.native.concurrent.AtomicReference` class could be
-used to store different pointers to frozen objects in a frozen object and automatically update them.
+Use [`@Volatile`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.concurrent/-volatile/) to annotate a `var` property.
+This makes all reads and writes to the property's backing field atomic. In addition, writes become immediately visible
+to other threads. When another thread accesses this property, it observes not only the updated value but also the changes
+that happened before the update.
+
+Alternatively, use [AtomicReference](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.concurrent.atomics/-atomic-reference/),
+which supports atomic reads and updates. On Kotlin/Native, it wraps a volatile variable and performs atomic operations.
+Kotlin also provides a set of types for atomic operations tailored to specific data types. You can use `AtomicInt`,
+`AtomicLong`, `AtomicBoolean`, `AtomicArray`, as well as `AtomicIntArray` and `AtomicLongArray`.
+
+For more information about access to shared mutable state, see the [Coroutines documentation](shared-mutable-state-and-concurrency.md).
 
 ## How can I compile my project with unreleased versions of Kotlin/Native?
 
 First, please consider trying [preview versions](eap.md).
 
 In case you need an even more recent development version, you can build Kotlin/Native from source code:
-clone [Kotlin repository](https://github.com/JetBrains/kotlin) and follow [these steps](https://github.com/JetBrains/kotlin/blob/master/kotlin-native/README.md#building-from-source).
+clone the [Kotlin repository](https://github.com/JetBrains/kotlin) and follow [these steps](https://github.com/JetBrains/kotlin/blob/master/kotlin-native/README.md#building-from-source).

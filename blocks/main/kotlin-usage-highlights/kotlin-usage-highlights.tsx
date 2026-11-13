@@ -1,0 +1,75 @@
+import React, { FC } from 'react';
+import { Button } from '@rescui/button';
+import { cardCn } from '@rescui/card';
+import classNames from 'classnames';
+import styles from './kotlin-usage-highlights.module.css';
+import { useTextStyles } from '@rescui/typography';
+import { useML, useTS } from '@jetbrains/kotlin-web-site-ui/out/components/breakpoints-v2';
+import { Tag, presets } from '@rescui/tag';
+
+interface KotlinUsageHighlightsItem {
+    company: string;
+    url: string;
+    text: string;
+    logo: ImgSrc;
+    tag: string;
+}
+
+interface KotlinUsageHighlightsProps {
+    title: string;
+    items: KotlinUsageHighlightsItem[];
+}
+
+export const KotlinUsageHighlights: FC<KotlinUsageHighlightsProps> = ({ title, items }) => {
+    const cardClassName = classNames(cardCn({ paddings: 16, isClickable: true }), styles.card);
+    const textCn = useTextStyles();
+    const isML = useML();
+    const isTS = useTS();
+    const visibleItems = isML ? items.slice(0, 4) : items;
+    const headerClass = isML ? 'rs-h3' : 'rs-h2';
+    const textClass = isTS ? 'rs-text-3' : 'rs-text-2';
+
+
+    const tagStyle= {
+        ...presets.filledLight,
+    };
+
+    return (
+        <div className={styles.kotlinUsageHighlights}>
+            <h2 className={classNames(textCn(headerClass), styles.title)}>{title}</h2>
+
+            <div className={styles.container}>
+                {visibleItems.map((item) => (
+                    <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className={cardClassName}
+                        key={item.company}
+                    >
+                        <div className={styles.cardContent}>
+                            <div className={styles.logoWrapper}>
+                                <img src={item.logo.src} alt={item.company} className={styles.logo} />
+                            </div>
+                            <span className={classNames(textCn(textClass, { hardness: 'hard' }), styles.text)}>
+                                {item.text}
+                            </span>
+                            <span className={styles.tag}>
+                                <Tag {...tagStyle}>{item.tag}</Tag>
+                            </span>
+                        </div>
+                    </a>
+                ))}
+            </div>
+            <div className={styles.buttonWrapper}>
+                <Button href="/case-studies/" size="l" mode="rock" theme="light" className={styles.primaryButton}>
+                    See all case studies
+                </Button>
+                <Button href={"/lp/enterprise-playbook/"}
+                    size="l" mode="outline" theme="light" className={styles.secondaryButton}>
+                    Enterprise playbook
+                </Button>
+            </div>
+        </div>
+    );
+};
